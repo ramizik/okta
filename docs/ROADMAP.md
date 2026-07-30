@@ -197,30 +197,44 @@ Legend: 🔴 blocks the demo · 🟡 makes the demo good · ⚪ only if time rem
 
 ---
 
-## Phase 9 — Parts Sourcing via PartsTech (Post-Hackathon / Next Step) 🔵 FUTURE
+## Phase 9 — Live Parts Sourcing (SerpApi) 🟠 BACKEND DONE, UI PENDING
 
-**Goal:** when the shop identifies a failed part during inspection, the technician can pull
-real, nearby-vendor part availability and pricing instead of typing a price by hand — and
-purchase it from inside the shop workflow.
+**Goal:** when the shop identifies a failed part during inspection, the advisor pulls real,
+nearby-vendor part availability and pricing instead of typing a price by hand.
 
-**Not in scope for the 4-hour build** — this is scope for *after* the demo, or an ⚪ stretch
-slot only if Phases 0–8 are fully green with time to spare. Do not let this displace the
-Stripe checkpoint (Phase 6) or Demo Hardening (Phase 8).
+**Provider decision:** **SerpApi `google_shopping`**, not PartsTech.
+PartsTech is partner-gated — API docs are behind approval and access requires emailing
+`PartsTech-Partner-API@oeconnection.com` (OEConnection) for a vetted username + API key.
+Days, not minutes. eBay Browse API was evaluated and **cut**: it needs a second auth
+mechanism (OAuth2 client-credentials + 2h token refresh) and returns used-marketplace
+listings, which read worse than "NAPA · RockAuto · AutoZone" for a repair shop.
+Google Shopping already *is* the multi-vendor comparison.
 
-- Provider: **PartsTech API** — purpose-built for repair-shop software (vs. a generic
-  retailer scraper). Search by VIN/keyword, compare suppliers, check nearby vendor
-  inventory, and place orders, all from inside the shop's own UI.
-- Surface: technician/advisor side only (`/shop/orders/[id]`), on each inspection
-  **Finding** — "Find this part" action next to a line item.
-- Flow: finding → PartsTech search (VIN + part category) → list of matching parts with
-  vendor, distance/availability, price → advisor selects one → part attached to the
-  finding → (stretch) purchase order placed through PartsTech.
-- Fallback: if the API key isn't provisioned or the call fails, show a static "search
-  unavailable" state — never block report generation or approval on this.
-- Cut if: PartsTech requires a sales-gated API key that can't be provisioned in the
-  remaining time. In that case, note it here as the documented next step and do not
-  fake it with hardcoded vendor data (violates the "no invisible/fake integrations
-  that read as real" rule).
+### Backend — ✅ DONE
+- [x] 🔴 `SERPAPI_API_KEY` in `.env` **and** Vercel production *(free tier, self-serve)*
+- [x] 🔴 `PartOffer` / `PartSearch` types, `Finding.selectedPart`, `Shop.location`
+- [x] 🔴 `src/lib/parts.ts` — `searchPartsForFinding(finding, vehicle, location)`
+  - [x] Step 1: MiniMax M3 turns the symptom into a parts query
+        *("Ignition misfire on cylinder 2" → "2019 Honda Accord EX iridium spark plugs set")*
+  - [x] Step 2: SerpApi `google_shopping` scoped to `Shop.location` → real vendors + prices
+  - [x] Relevance order preserved *(price-sorting surfaced one plug instead of the set of 4)*
+  - [x] 8s query timeout / 12s search timeout, capped at 6 offers
+- [x] 🔴 **Fallback chain:** no key / API error / no results → seeded `MOCK_PART_OFFERS`.
+      Never throws, exactly like `generateReport`. Verified with the key unset.
+- [x] 🔴 `searchPartsAction` + `selectPartAction` in `src/app/actions.ts` — **advisor-only**
+      *(customers must never reach it — it's shop-side work and burns quota)*
+- [x] 🟡 `scripts/parts-smoke.mts` — dev harness, `npx tsx --env-file=.env`
+- [x] 🔴 Verified live against 3 hero findings; typecheck + build green; committed
+
+### Frontend — ⏳ TODO
+- [ ] 🟡 "Find this part" action per finding on `/shop/orders/[id]`
+- [ ] 🟡 Offer list: vendor, price, delivery, rating, thumbnail → select one
+- [ ] 🟡 Selected part shown on the finding; "search unavailable" state on fallback
+- [ ] ⚪ Advisor's sourced cost vs. quoted price — the shop's margin, visible
+
+### Later
+- [ ] ⚪ Actually place the order (SerpApi is read-only — needs a real vendor account)
+- [ ] ⚪ Revisit PartsTech if partner access is granted; `parts.ts` is source-abstracted
 
 ---
 
