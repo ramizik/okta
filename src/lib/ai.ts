@@ -6,11 +6,9 @@ import { MOCK_HERO_REPORT } from "./seed";
 // any failure silently falls back to the pre-generated hero report.
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-// Free-tier models, tried in order. nemotron-3-super verified good output.
-const MODELS = [
-  "nvidia/nemotron-3-super-120b-a12b:free",
-  "openai/gpt-oss-20b:free",
-];
+// MiniMax M3 via the user's BYOK key connected in OpenRouter.
+// Single model by design — on any failure we serve the seeded fallback report.
+const MODELS = ["minimax/minimax-m3"];
 // Free-tier models take ~14s on the full inspection sheet; the generate
 // button's loading state covers this, and the fallback covers anything longer.
 const TIMEOUT_MS = 20_000;
