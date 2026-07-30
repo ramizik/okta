@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "project": {
+    "initializedAt": "2026-07-30T19:51:28.695Z",
+    "merchantDisplayName": "Hackathon",
+    "merchantId": "acct_1TyztPR0nb8JZJKY",
+    "projectId": "project_61V8NweBW3rkZU1xB16V8NqlGGSQv2Q0czD5bI2xMXou",
+    "projectName": "hackathon"
+  },
+  "providers": {
+    "auth0": {
+      "accountRequestId": "facctrq_61V8P0UNlESA1yuUu16V8NqlGGSQv2Q0czD5bI2xMBP6",
+      "configuration": {
+        "locality": "us",
+        "naming_prefix": "hackathon-app"
+      },
+      "linkedAt": "2026-07-30T20:59:34.575Z",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "redirectUrl": null,
+      "requestedAt": "2026-07-30T20:59:34.575Z",
+      "status": "complete"
+    }
+  },
+  "resources": {
+    "auth0-plan": {
+      "configuration": {},
+      "createdAt": "2026-07-30T20:59:37.342Z",
+      "lastRevealedAt": "2026-07-30T20:59:37.568Z",
+      "lastStatus": "complete",
+      "name": "auth0-plan",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "resourceId": "fres_61V8P0Y0HvThU00LY16V8NqlGGSQv2Q0czD5bI2xM6Zs",
+      "serviceId": "free"
+    },
+    "hackathon-app": {
+      "configuration": {
+        "name": "hackathon-app",
+        "app_type": "regular_web",
+        "callbacks": [
+          "http://localhost:3000/api/auth/callback"
+        ],
+        "allowed_logout_urls": [
+          "http://localhost:3000"
+        ],
+        "web_origins": [
+          "http://localhost:3000"
+        ]
+      },
+      "createdAt": "2026-07-30T21:01:42.059Z",
+      "lastRevealedAt": "2026-07-30T21:01:42.377Z",
+      "lastStatus": "complete",
+      "name": "hackathon-app",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "resourceId": "fres_61V8P2VlEkxmm9SED16V8NqlGGSQv2Q0czD5bI2xM0gK",
+      "serviceId": "client"
+    }
+  }
+}
