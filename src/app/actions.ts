@@ -105,19 +105,5 @@ export async function setApprovalAction(
   return { ok: true as const, totalCents: approvedTotalCents(order) };
 }
 
-/**
- * Demo payment. Phase 6 swaps the body for a Stripe Checkout Session built
- * from these same server-computed line items; the UI contract stays identical.
- */
-export async function payOrderAction(orderId: string) {
-  const order = await requireOwner(orderId);
-  const totalCents = approvedTotalCents(order);
-  if (totalCents <= 0) return { ok: false as const, totalCents: 0 };
-
-  updateOrder(orderId, { status: "PAID" });
-  revalidatePath(`/garage/orders/${orderId}`);
-  revalidatePath("/garage");
-  revalidatePath(`/shop/orders/${orderId}`);
-  revalidatePath("/shop");
-  return { ok: true as const, totalCents };
-}
+// Repair payment lives in POST /api/checkout/repair — it has to hand back a
+// Stripe Checkout URL, and nothing the client can call may mark an order paid.

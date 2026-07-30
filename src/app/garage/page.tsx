@@ -36,7 +36,7 @@ export default async function Garage() {
       <AppTopBar role="customer" user={name} shopName={shop.name} />
       <RoleSwitchHint email={session.user.email} />
 
-      <main className="mx-auto max-w-[1280px] px-6 py-8">
+      <main className="app-container py-8">
         <h1 className="text-3xl font-bold">My Garage</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Welcome back, {firstName}

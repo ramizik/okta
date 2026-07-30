@@ -14,13 +14,11 @@ import {
 } from "@/components/pitcrew/status";
 import { TechWorkflowPanel } from "@/components/pitcrew/workflow-panels";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { formatUsd } from "@/lib/format";
 import { bySeverity, orderTotalCents, vehicleName } from "@/lib/pitcrew-ui";
 import type { RepairOrder } from "@/lib/types";
 import {
   generateOrderReportAction,
-  saveNotesAction,
   sendToCustomerAction,
 } from "@/app/actions";
 
@@ -32,7 +30,6 @@ const loadingLabels = [
 
 export function OrderWorkbench({ order }: { order: RepairOrder }) {
   const router = useRouter();
-  const [notes, setNotes] = useState(order.rawTechNotes);
   const [generating, startGenerating] = useTransition();
   const [sending, startSending] = useTransition();
   const [phase, setPhase] = useState(0);
@@ -80,7 +77,7 @@ export function OrderWorkbench({ order }: { order: RepairOrder }) {
   const canSend = hasReport && order.status === "INSPECTION_COMPLETE";
 
   return (
-    <main className="mx-auto max-w-[1280px] px-6 py-8">
+    <main className="app-container py-8">
       <Link
         href="/shop"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground"
@@ -139,14 +136,9 @@ export function OrderWorkbench({ order }: { order: RepairOrder }) {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section>
           <p className="label-caps">Technician notes</p>
-          <Textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            onBlur={() => {
-              if (notes !== order.rawTechNotes) saveNotesAction(order.id, notes);
-            }}
-            className="mt-2 min-h-72 resize-none bg-secondary/60 font-mono text-[13px] leading-relaxed"
-          />
+          <div className="mt-2 min-h-72 whitespace-pre-wrap rounded-md border border-border bg-secondary/60 p-3 font-mono text-[13px] leading-relaxed text-foreground">
+            {order.rawTechNotes}
+          </div>
           <p className="mt-3 flex items-center gap-2 text-[13px] text-muted-foreground">
             {generating ? (
               <>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Check, ChevronDown, Loader2, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { FindingCard } from "@/components/pitcrew/finding-card";
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { formatUsd } from "@/lib/format";
 import { bySeverity, isPaid, vehicleName } from "@/lib/pitcrew-ui";
 import type { RepairOrder } from "@/lib/types";
-import { payOrderAction, setApprovalAction } from "@/app/actions";
+import { setApprovalAction } from "@/app/actions";
 
 export function CustomerReport({ order }: { order: RepairOrder }) {
   const router = useRouter();
@@ -40,14 +40,29 @@ export function CustomerReport({ order }: { order: RepairOrder }) {
 
   const pay = () =>
     startPaying(async () => {
-      const res = await payOrderAction(order.id);
-      if (res.ok) {
-        toast.success(`Payment of ${formatUsd(res.totalCents)} received`, {
-          description: "Your shop has been notified and work is starting.",
+      try {
+        const res = await fetch("/api/checkout/repair", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: order.id }),
         });
-        router.refresh();
-      } else {
-        toast.error("Approve at least one item before paying");
+        const data = (await res.json()) as { url?: string; error?: string };
+        if (!res.ok || !data.url) {
+          toast.error(data.error ?? "Could not start checkout");
+          return;
+        }
+        // Relative URL = the no-Stripe demo path; absolute = Stripe Checkout.
+        if (data.url.startsWith("/")) {
+          toast.success(`Payment of ${formatUsd(totalCents)} received`, {
+            description: "Your shop has been notified and work is starting.",
+          });
+          router.push(data.url);
+          router.refresh();
+        } else {
+          window.location.assign(data.url);
+        }
+      } catch {
+        toast.error("Could not reach checkout");
       }
     });
 

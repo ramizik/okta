@@ -240,24 +240,17 @@ export function SeverityDot({ severity }: { severity: Severity }) {
   );
 }
 
-const verdictMap: Record<Verdict, { label: string; icon: string; cls: string }> =
-  {
-    SAFE_TO_DRIVE: {
-      label: "Safe to drive",
-      icon: "✓",
-      cls: "bg-sev-green-bg text-sev-green-fg border-sev-green-border",
-    },
-    SERVICE_SOON: {
-      label: "Service soon",
-      icon: "⚠",
-      cls: "bg-sev-amber-bg text-sev-amber-fg border-sev-amber-border",
-    },
-    STOP_DRIVING: {
-      label: "Stop driving",
-      icon: "⛔",
-      cls: "bg-sev-red-bg text-sev-red-fg border-sev-red-border",
-    },
-  };
+// Only the alarming verdict gets a badge — routine verdicts stay quiet so
+// red keeps its meaning ("Removed Safe to drive tag" in the design system).
+const verdictMap: Partial<
+  Record<Verdict, { label: string; icon: string; cls: string }>
+> = {
+  STOP_DRIVING: {
+    label: "Stop driving",
+    icon: "⛔",
+    cls: "bg-sev-red-bg text-sev-red-fg border-sev-red-border",
+  },
+};
 
 export function VerdictBadge({
   verdict,
@@ -267,6 +260,7 @@ export function VerdictBadge({
   size?: "sm" | "lg";
 }) {
   const v = verdictMap[verdict];
+  if (!v) return null;
   return (
     <span
       className={cn(

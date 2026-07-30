@@ -36,7 +36,7 @@ export default async function ShopOrderDetail({
     return (
       <div className="min-h-screen">
         <AppTopBar role="advisor" user={advisorName} shopName={shop.name} />
-        <main className="mx-auto max-w-[1280px] px-6 py-16">
+        <main className="app-container py-16">
           <EmptyState
             icon={<Sparkles className="h-5 w-5" />}
             title="We couldn't find that order"

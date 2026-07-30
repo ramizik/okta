@@ -65,7 +65,7 @@ export function PricingPlans({
   return (
     <div className="min-h-screen">
       <nav className="border-b border-border bg-card">
-        <div className="mx-auto grid max-w-[1280px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-6 py-4">
+        <div className="app-container grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-4">
           <Link href="/">
             <Logo tone="dark" />
           </Link>
@@ -83,7 +83,7 @@ export function PricingPlans({
         </div>
       </nav>
 
-      <main className="mx-auto max-w-[1280px] px-6 py-16">
+      <main className="app-container py-16">
         <div className="mx-auto max-w-xl text-center">
           <span className="inline-flex items-center rounded-full border border-border bg-card px-3 py-1 text-[13px] font-medium text-muted-foreground">
             For service shops

@@ -50,7 +50,7 @@ export function AppTopBar({
 }) {
   return (
     <header className="sticky top-0 z-40 bg-navy text-navy-foreground">
-      <div className="mx-auto grid max-w-[1280px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-6 py-3">
+      <div className="app-container grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-3">
         <div className="flex min-w-0 items-center gap-4">
           <Link href={homeForRole(role)} className="shrink-0">
             <Logo tone="light" />
@@ -84,8 +84,8 @@ export function AppTopBar({
 /** Demo shortcuts strip. Role switching goes through Auth0, not a link. */
 export function RoleSwitchHint({ email }: { email?: string }) {
   return (
-    <div className="border-t border-navy-soft bg-navy-soft text-navy-foreground">
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-3 px-6 py-2 text-xs">
+    <div className="border-b border-border bg-secondary text-muted-foreground">
+      <div className="app-container flex flex-wrap items-center gap-3 py-2 text-xs">
         <span className="opacity-70">
           Demo{email ? ` · signed in as ${email}` : ""}:
         </span>

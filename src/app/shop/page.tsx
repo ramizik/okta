@@ -64,7 +64,7 @@ export default async function ShopDashboard({
       />
       <RoleSwitchHint email={session.user.email} />
 
-      <main className="mx-auto max-w-[1280px] px-6 py-8">
+      <main className="app-container py-8">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
           <div className="min-w-0">
             <h1 className="text-3xl font-bold">Repair orders</h1>

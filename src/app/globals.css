@@ -5,21 +5,27 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * PitCrew design system.
- * Brand accent is blue on purpose: severity red/amber/green must never
- * compete with decoration.
+ * PitCrew global design system.
+ * Warm paper canvas, neutral ink, blue used only for primary/active states,
+ * severity red/amber/green reserved for meaning.
  */
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
-  --font-heading: var(--font-geist-sans);
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 28px;
+  --radius-2xl: 32px;
+  --radius-3xl: 36px;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-heading: var(--font-sans);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -28,6 +34,8 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-hover: var(--primary-hover);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -37,6 +45,7 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
@@ -52,45 +61,59 @@
   --color-sev-green-fg: var(--sev-green-fg);
   --color-sev-green-bg: var(--sev-green-bg);
   --color-sev-green-border: var(--sev-green-border);
-  --shadow-card: 0 1px 3px oklch(0.208 0.042 265.755 / 0.08);
-  --shadow-float: 0 8px 24px oklch(0.208 0.042 265.755 / 0.12);
+
+  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-lift:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-float:
+    0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-overlay: 0 25px 50px -12px rgb(0 0 0 / 0.18);
 }
 
 :root {
-  --radius: 0.75rem;
-  --background: oklch(0.984 0.003 247.858);
-  --foreground: oklch(0.208 0.042 265.755);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.208 0.042 265.755);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.208 0.042 265.755);
-  --primary: oklch(0.546 0.245 262.881);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.546 0.245 262.881);
+  --radius: 24px;
+  --content-max-width: 1380px;
 
-  --navy: oklch(0.208 0.042 265.755);
-  --navy-soft: oklch(0.279 0.041 260.031);
-  --navy-foreground: oklch(0.984 0.003 247.858);
+  --background: #f4f2ed;
+  --foreground: #0b0b0d;
+  --card: #ffffff;
+  --card-foreground: #0b0b0d;
+  --popover: #ffffff;
+  --popover-foreground: #0b0b0d;
 
-  --sev-red-fg: oklch(0.577 0.245 27.325);
-  --sev-red-bg: oklch(0.971 0.013 17.38);
-  --sev-red-border: oklch(0.885 0.062 18.334);
-  --sev-amber-fg: oklch(0.646 0.222 41.116);
-  --sev-amber-bg: oklch(0.987 0.022 95.277);
-  --sev-amber-border: oklch(0.905 0.114 87.9);
-  --sev-green-fg: oklch(0.627 0.194 149.214);
-  --sev-green-bg: oklch(0.982 0.018 155.826);
-  --sev-green-border: oklch(0.905 0.093 164.15);
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #eff6ff;
+
+  --secondary: #f4f4f5;
+  --secondary-foreground: #0b0b0d;
+  --muted: #fafafa;
+  --muted-foreground: #52525c;
+  --accent: #f4f4f5;
+  --accent-foreground: #0b0b0d;
+
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+  --input: #e4e4e7;
+  --ring: #2563eb;
+
+  --navy: #0b0b0d;
+  --navy-soft: #27272a;
+  --navy-foreground: #fafafa;
+
+  --sev-red-fg: #dc2626;
+  --sev-red-bg: #fff4f3;
+  --sev-red-border: #fecaca;
+  --sev-amber-fg: #b45309;
+  --sev-amber-bg: #fff8e8;
+  --sev-amber-border: #fde68a;
+  --sev-green-fg: #15803d;
+  --sev-green-bg: #effaf3;
+  --sev-green-border: #bbf7d0;
 }
 
 @layer base {
@@ -102,18 +125,35 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 24px;
     -webkit-font-smoothing: antialiased;
   }
 
   h1,
   h2,
-  h3 {
-    letter-spacing: -0.02em;
+  h3,
+  h4 {
+    letter-spacing: -0.025em;
+  }
+}
+
+@utility app-container {
+  width: min(calc(100% - 32px), var(--content-max-width));
+  margin-inline: auto;
+
+  @media (min-width: 768px) {
+    width: min(calc(100% - 48px), var(--content-max-width));
+  }
+
+  @media (min-width: 1024px) {
+    width: min(calc(100% - 64px), var(--content-max-width));
   }
 }
 
 @utility label-caps {
-  font-size: 0.75rem;
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 500;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -122,6 +162,7 @@
 
 @utility tnum {
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
 }
 
 @keyframes pit-rise {
