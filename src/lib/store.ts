@@ -43,6 +43,12 @@ export function getShop(): Shop {
   return state().shop;
 }
 
+export function setShopPlan(plan: Shop["plan"]): Shop {
+  const shop = state().shop;
+  shop.plan = plan;
+  return shop;
+}
+
 export function getUsers(): User[] {
   return state().users;
 }

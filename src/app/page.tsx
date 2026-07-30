@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   ArrowRight,
   Sparkles,
@@ -57,6 +58,9 @@ export default function Landing() {
         <div className="mx-auto grid max-w-[1280px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-6 py-4">
           <Logo tone="dark" />
           <div className="flex shrink-0 items-center gap-2">
+            <Button variant="ghost" asChild>
+              <Link href="/pricing">Pricing</Link>
+            </Button>
             <Button asChild>
               <a href="/auth/login">Sign in</a>
             </Button>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ClipboardList, Clock, DollarSign, Timer } from "lucide-react";
+import { Check, ClipboardList, Clock, DollarSign, Timer } from "lucide-react";
+import { getPlan } from "@/lib/plans";
 import { auth0 } from "@/lib/auth0";
 import { getSeedUser } from "@/lib/roles";
 import { approvedTotalCents, getOrders, getShop } from "@/lib/store";
@@ -18,7 +20,12 @@ export const metadata: Metadata = {
     "Track repair orders, approvals awaiting customers, and revenue for your shop in one dashboard.",
 };
 
-export default async function ShopDashboard() {
+export default async function ShopDashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ subscribed?: string }>;
+}) {
+  const { subscribed } = await searchParams;
   const session = await auth0.getSession();
   if (!session) redirect("/auth/login?returnTo=/shop");
 
@@ -65,12 +72,32 @@ export default async function ShopDashboard() {
               {shop.name} · {today}
             </p>
           </div>
-          {shop.plan && (
-            <span className="shrink-0 rounded-full border border-border bg-card px-3 py-1 text-[13px] font-medium capitalize text-muted-foreground">
-              {shop.plan} plan
-            </span>
-          )}
+          <Link
+            href="/pricing"
+            className="shrink-0 rounded-full border border-border bg-card px-3 py-1 text-[13px] font-medium text-muted-foreground transition-colors duration-150 hover:border-primary/40 hover:text-foreground"
+          >
+            {shop.plan ? (
+              <>
+                <span className="capitalize">{shop.plan}</span> plan · Manage
+              </>
+            ) : (
+              "Choose a plan"
+            )}
+          </Link>
         </div>
+
+        {subscribed && getPlan(subscribed) && (
+          <div className="mt-6 rounded-xl border border-sev-green-border bg-sev-green-bg p-5">
+            <p className="flex items-center gap-2 font-semibold text-sev-green-fg">
+              <Check className="h-5 w-5" /> {getPlan(subscribed)?.name} plan is
+              active
+            </p>
+            <p className="mt-1 text-[15px] text-foreground/80">
+              {shop.name} is subscribed. Every advisor on this shop can generate
+              reports and take payments.
+            </p>
+          </div>
+        )}
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
