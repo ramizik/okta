@@ -255,7 +255,7 @@ export function buildSeedOrders(): RepairOrder[] {
         trim: "XLT",
         plate: "4TRK882",
         mileage: 91204,
-        photoUrl: "/vehicles/f150.jpg",
+        photoUrl: "",
       },
       status: "IN_PROGRESS",
       rawTechNotes:
@@ -311,7 +311,7 @@ export function buildSeedOrders(): RepairOrder[] {
         trim: "Premium",
         plate: "9SUB410",
         mileage: 51377,
-        photoUrl: "/vehicles/outback.jpg",
+        photoUrl: "",
       },
       status: "READY",
       rawTechNotes:

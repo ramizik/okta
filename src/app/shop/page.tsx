@@ -1,16 +1,23 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { ClipboardList, Clock, DollarSign, Timer } from "lucide-react";
 import { auth0 } from "@/lib/auth0";
 import { getSeedUser } from "@/lib/roles";
-import { getOrders, getShop } from "@/lib/store";
-import { formatUsd, formatRelative } from "@/lib/format";
-import { approvedTotalCents } from "@/lib/store";
-import { AppHeader } from "@/components/app-header";
-import { Badge } from "@/components/ui/badge";
+import { approvedTotalCents, getOrders, getShop } from "@/lib/store";
+import { formatRelative, formatUsd } from "@/lib/format";
+import { isPaid, orderTotalCents, vehicleName } from "@/lib/pitcrew-ui";
+import { AppTopBar, RoleSwitchHint } from "@/components/pitcrew/app-shell";
+import { StatCard } from "@/components/pitcrew/primitives";
+import { OrdersTable, type OrderRow } from "./orders-table";
 
 export const dynamic = "force-dynamic";
 
-// Placeholder advisor dashboard — proves auth + data wiring.
-// Phase 3 / Lovable UI replaces the body of this page.
+export const metadata: Metadata = {
+  title: "Repair orders — PitCrew shop dashboard",
+  description:
+    "Track repair orders, approvals awaiting customers, and revenue for your shop in one dashboard.",
+};
+
 export default async function ShopDashboard() {
   const session = await auth0.getSession();
   if (!session) redirect("/auth/login?returnTo=/shop");
@@ -19,55 +26,78 @@ export default async function ShopDashboard() {
   const user = getSeedUser(session.user.email);
   const orders = getOrders(shop.id);
 
+  const rows: OrderRow[] = orders.map((o) => ({
+    id: o.id,
+    vehicle: vehicleName(o),
+    plate: o.vehicle.plate,
+    customerName: o.customerName,
+    status: o.status,
+    paid: isPaid(o),
+    total: formatUsd(orderTotalCents(o)),
+    updated: formatRelative(o.updatedAt),
+  }));
+
+  const awaiting = orders.filter((o) => o.status === "AWAITING_APPROVAL").length;
+  const revenueCents = orders
+    .filter(isPaid)
+    .reduce((sum, o) => sum + approvedTotalCents(o), 0);
+
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader
-        name={user?.name ?? session.user.name ?? "Advisor"}
+    <div className="min-h-screen">
+      <AppTopBar
         role="advisor"
+        user={user?.name ?? session.user.name ?? "Advisor"}
         shopName={shop.name}
       />
-      <main className="mx-auto max-w-[1280px] px-6 py-10">
-        <h1 className="text-3xl font-bold tracking-tight">Repair Orders</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{shop.name}</p>
-        <div className="mt-8 overflow-hidden rounded-xl border bg-card">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wider text-muted-foreground">
-                <th className="px-4 py-3 font-medium">Vehicle</th>
-                <th className="px-4 py-3 font-medium">Customer</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 text-right font-medium">Approved</th>
-                <th className="px-4 py-3 text-right font-medium">Updated</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((o) => (
-                <tr key={o.id} className="border-b last:border-0">
-                  <td className="px-4 py-3">
-                    <div className="font-semibold">
-                      {o.vehicle.year} {o.vehicle.make} {o.vehicle.model}
-                    </div>
-                    <div className="font-mono text-xs text-muted-foreground">
-                      {o.vehicle.plate}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">{o.customerName}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant="secondary">
-                      {o.status.replaceAll("_", " ")}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-right tabular-nums">
-                    {formatUsd(approvedTotalCents(o))}
-                  </td>
-                  <td className="px-4 py-3 text-right text-muted-foreground">
-                    {formatRelative(o.updatedAt)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <RoleSwitchHint email={session.user.email} />
+
+      <main className="mx-auto max-w-[1280px] px-6 py-8">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+          <div className="min-w-0">
+            <h1 className="text-3xl font-bold">Repair orders</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {shop.name} · {today}
+            </p>
+          </div>
+          {shop.plan && (
+            <span className="shrink-0 rounded-full border border-border bg-card px-3 py-1 text-[13px] font-medium capitalize text-muted-foreground">
+              {shop.plan} plan
+            </span>
+          )}
         </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Orders today"
+            value={String(orders.length)}
+            icon={<ClipboardList className="h-4 w-4" />}
+          />
+          <StatCard
+            label="Awaiting approval"
+            value={String(awaiting)}
+            hint="Customer hasn't responded"
+            icon={<Clock className="h-4 w-4" />}
+          />
+          <StatCard
+            label="Approved revenue"
+            value={formatUsd(revenueCents)}
+            icon={<DollarSign className="h-4 w-4" />}
+          />
+          <StatCard
+            label="Avg approval"
+            value="14 min"
+            hint="Down from 3.5 hours"
+            icon={<Timer className="h-4 w-4" />}
+          />
+        </div>
+
+        <OrdersTable rows={rows} />
       </main>
     </div>
   );

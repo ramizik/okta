@@ -60,14 +60,17 @@
         "app_type": "regular_web",
         "callbacks": [
           "http://localhost:3000/auth/callback",
+          "https://pitcrew-okta.vercel.app/auth/callback",
           "https://pitcrew-woad.vercel.app/auth/callback"
         ],
         "allowed_logout_urls": [
           "http://localhost:3000",
+          "https://pitcrew-okta.vercel.app",
           "https://pitcrew-woad.vercel.app"
         ],
         "web_origins": [
           "http://localhost:3000",
+          "https://pitcrew-okta.vercel.app",
           "https://pitcrew-woad.vercel.app"
         ],
         "oidc_conformant": true,
@@ -77,7 +80,7 @@
         ]
       },
       "createdAt": "2026-07-30T21:01:42.059Z",
-      "lastRevealedAt": "2026-07-30T22:27:04.943Z",
+      "lastRevealedAt": "2026-07-30T22:30:17.579Z",
       "lastStatus": "complete",
       "name": "hackathon-app",
       "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
