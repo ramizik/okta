@@ -198,6 +198,33 @@ Legend: 🔴 blocks the demo · 🟡 makes the demo good · ⚪ only if time rem
 
 ---
 
+## Phase 9 — Parts Sourcing via PartsTech (Post-Hackathon / Next Step) 🔵 FUTURE
+
+**Goal:** when the shop identifies a failed part during inspection, the technician can pull
+real, nearby-vendor part availability and pricing instead of typing a price by hand — and
+purchase it from inside the shop workflow.
+
+**Not in scope for the 4-hour build** — this is scope for *after* the demo, or an ⚪ stretch
+slot only if Phases 0–8 are fully green with time to spare. Do not let this displace the
+Stripe checkpoint (Phase 6) or Demo Hardening (Phase 8).
+
+- Provider: **PartsTech API** — purpose-built for repair-shop software (vs. a generic
+  retailer scraper). Search by VIN/keyword, compare suppliers, check nearby vendor
+  inventory, and place orders, all from inside the shop's own UI.
+- Surface: technician/advisor side only (`/shop/orders/[id]`), on each inspection
+  **Finding** — "Find this part" action next to a line item.
+- Flow: finding → PartsTech search (VIN + part category) → list of matching parts with
+  vendor, distance/availability, price → advisor selects one → part attached to the
+  finding → (stretch) purchase order placed through PartsTech.
+- Fallback: if the API key isn't provisioned or the call fails, show a static "search
+  unavailable" state — never block report generation or approval on this.
+- Cut if: PartsTech requires a sales-gated API key that can't be provisioned in the
+  remaining time. In that case, note it here as the documented next step and do not
+  fake it with hardcoded vendor data (violates the "no invisible/fake integrations
+  that read as real" rule).
+
+---
+
 ## Cut List — reject on sight
 
 OBD/telemetry · real-time chat *(the AI assistant is request/response, not chat infra)* ·
