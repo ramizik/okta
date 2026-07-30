@@ -24,6 +24,26 @@ export interface Finding {
   urgency: string;
   priceCents: number;
   approved: boolean | null; // null = not yet answered
+  selectedPart?: PartOffer; // advisor-sourced part for this repair
+}
+
+/** A purchasable part matched to a Finding — sourced live from the web. */
+export interface PartOffer {
+  id: string;
+  title: string;
+  vendor: string; // "NAPA Auto Parts", "RockAuto"
+  priceCents: number;
+  delivery: string; // "Free delivery", "Pickup today"
+  thumbnail: string;
+  link: string;
+  rating?: number;
+  inStock: boolean;
+}
+
+export interface PartSearch {
+  query: string; // what the AI actually searched for
+  offers: PartOffer[];
+  source: "live" | "fallback";
 }
 
 export interface Report {
@@ -62,6 +82,7 @@ export interface Shop {
   id: string;
   name: string;
   plan: "starter" | "pro" | null;
+  location: string; // SerpApi location string — drives "near shop" parts results
 }
 
 export interface User {

@@ -1,9 +1,10 @@
-import type { Report, RepairOrder, Shop, User } from "./types";
+import type { PartOffer, Report, RepairOrder, Shop, User } from "./types";
 
 export const SEED_SHOP: Shop = {
   id: "shop_precision",
   name: "Precision Auto Care",
   plan: "starter",
+  location: "Stockton,California,United States",
 };
 
 export const SEED_USERS: User[] = [
@@ -155,6 +156,142 @@ export const MOCK_HERO_REPORT: Report = {
     })),
   ],
 };
+
+// Demo safety net for parts sourcing. If SerpApi is missing, rate-limited or
+// slow, these render instead — same pattern as MOCK_HERO_REPORT. Captured from
+// real Google Shopping results so the vendors and prices are honest.
+export const MOCK_PART_OFFERS: Record<string, PartOffer[]> = {
+  f_misfire: [
+    {
+      id: "mock_misfire_1",
+      title: "NGK Laser Iridium Spark Plug Set of 4 — Honda Accord 2.0T",
+      vendor: "NAPA Auto Parts",
+      priceCents: 4796,
+      delivery: "Pickup today",
+      thumbnail: "",
+      link: "https://www.napaonline.com/",
+      rating: 4.8,
+      inStock: true,
+    },
+    {
+      id: "mock_misfire_2",
+      title: "Denso Iridium TT Spark Plugs (4-Pack) fits 2018-2020 Accord",
+      vendor: "RockAuto",
+      priceCents: 3912,
+      delivery: "Free delivery",
+      thumbnail: "",
+      link: "https://www.rockauto.com/",
+      rating: 4.6,
+      inStock: true,
+    },
+    {
+      id: "mock_misfire_3",
+      title: "Honda Genuine OEM Spark Plug 12290-6A0-A01",
+      vendor: "O'Reilly Auto Parts",
+      priceCents: 6299,
+      delivery: "Pickup today",
+      thumbnail: "",
+      link: "https://www.oreillyauto.com/",
+      rating: 4.9,
+      inStock: true,
+    },
+  ],
+  f_oil: [
+    {
+      id: "mock_oil_1",
+      title: "Mobil 1 Extended Performance 0W-20 Full Synthetic, 5 qt",
+      vendor: "Walmart",
+      priceCents: 3374,
+      delivery: "Free delivery",
+      thumbnail: "",
+      link: "https://www.walmart.com/",
+      rating: 4.8,
+      inStock: true,
+    },
+    {
+      id: "mock_oil_2",
+      title: "Honda Genuine 0W-20 Synthetic Blend + Filter Kit",
+      vendor: "AutoZone",
+      priceCents: 4199,
+      delivery: "Pickup today",
+      thumbnail: "",
+      link: "https://www.autozone.com/",
+      rating: 4.7,
+      inStock: true,
+    },
+  ],
+  f_belts: [
+    {
+      id: "mock_belts_1",
+      title: "Gates Serpentine Belt K060922 — Honda Accord",
+      vendor: "RockAuto",
+      priceCents: 2488,
+      delivery: "Free delivery",
+      thumbnail: "",
+      link: "https://www.rockauto.com/",
+      rating: 4.7,
+      inStock: true,
+    },
+    {
+      id: "mock_belts_2",
+      title: "Continental Elite Poly-V Serpentine Belt",
+      vendor: "NAPA Auto Parts",
+      priceCents: 3199,
+      delivery: "Pickup today",
+      thumbnail: "",
+      link: "https://www.napaonline.com/",
+      inStock: true,
+    },
+  ],
+  f_cabin_filter: [
+    {
+      id: "mock_cabin_1",
+      title: "FRAM Fresh Breeze Cabin Air Filter CF12157 — Accord 2018-2022",
+      vendor: "AutoZone",
+      priceCents: 2299,
+      delivery: "Pickup today",
+      thumbnail: "",
+      link: "https://www.autozone.com/",
+      rating: 4.6,
+      inStock: true,
+    },
+    {
+      id: "mock_cabin_2",
+      title: "K&N Premium Cabin Air Filter VF2060",
+      vendor: "Amazon",
+      priceCents: 3495,
+      delivery: "Free delivery",
+      thumbnail: "",
+      link: "https://www.amazon.com/",
+      rating: 4.5,
+      inStock: true,
+    },
+  ],
+};
+
+/** Generic fallback when a finding has no seeded offers. */
+export const MOCK_PART_OFFERS_GENERIC: PartOffer[] = [
+  {
+    id: "mock_generic_1",
+    title: "OEM-equivalent replacement part — Honda Accord",
+    vendor: "RockAuto",
+    priceCents: 7999,
+    delivery: "Free delivery",
+    thumbnail: "",
+    link: "https://www.rockauto.com/",
+    inStock: true,
+  },
+  {
+    id: "mock_generic_2",
+    title: "Premium aftermarket replacement part",
+    vendor: "NAPA Auto Parts",
+    priceCents: 9450,
+    delivery: "Pickup today",
+    thumbnail: "",
+    link: "https://www.napaonline.com/",
+    inStock: true,
+  },
+];
 
 const now = Date.now();
 const minsAgo = (m: number) => new Date(now - m * 60000).toISOString();

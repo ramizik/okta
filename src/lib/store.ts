@@ -1,4 +1,4 @@
-import type { Finding, RepairOrder, Shop, User } from "./types";
+import type { Finding, PartOffer, RepairOrder, Shop, User } from "./types";
 import { buildSeedOrders, SEED_SHOP, SEED_USERS } from "./seed";
 
 // In-memory store for the demo. Backed by globalThis so it survives
@@ -94,6 +94,24 @@ export function setItemApproval(
   const finding = order?.report?.findings.find((f) => f.id === itemId);
   if (!order || !finding) return undefined;
   finding.approved = approved;
+  order.updatedAt = new Date().toISOString();
+  return order;
+}
+
+/** Attach (or clear) the advisor-sourced part for one finding. */
+export function setFindingPart(
+  orderId: string,
+  findingId: string,
+  part: PartOffer | null,
+): RepairOrder | undefined {
+  const order = getOrder(orderId);
+  const finding = order?.report?.findings.find((f) => f.id === findingId);
+  if (!order || !finding) return undefined;
+  if (part) {
+    finding.selectedPart = part;
+  } else {
+    delete finding.selectedPart;
+  }
   order.updatedAt = new Date().toISOString();
   return order;
 }

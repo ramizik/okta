@@ -6,11 +6,14 @@ import { resolveRole } from "@/lib/roles";
 import {
   approvedTotalCents,
   getOrder,
+  getShop,
+  setFindingPart,
   setItemApproval,
   updateOrder,
 } from "@/lib/store";
 import { generateReport } from "@/lib/ai";
-import type { RepairOrder } from "@/lib/types";
+import { searchPartsForFinding } from "@/lib/parts";
+import type { PartOffer, RepairOrder } from "@/lib/types";
 
 // Server actions are the whole write API for the demo. Every one of them
 // re-checks the session: role for advisor actions, ownership for customer
@@ -103,6 +106,39 @@ export async function setApprovalAction(
   revalidatePath(`/shop/orders/${orderId}`);
   revalidatePath("/shop");
   return { ok: true as const, totalCents: approvedTotalCents(order) };
+}
+
+/**
+ * Advisor-only: source real, purchasable parts for one finding.
+ * Read-only — it never mutates the order, so it's safe to call repeatedly.
+ * Customers must never reach this (it burns SerpApi quota and is shop-side work).
+ */
+export async function searchPartsAction(orderId: string, findingId: string) {
+  await requireAdvisor();
+  const order = getOrder(orderId);
+  const finding = order?.report?.findings.find((f) => f.id === findingId);
+  if (!order || !finding) {
+    return { ok: false as const, query: "", offers: [], source: "fallback" as const };
+  }
+
+  const result = await searchPartsForFinding(
+    finding,
+    order.vehicle,
+    getShop().location,
+  );
+  return { ok: true as const, ...result };
+}
+
+/** Advisor-only: attach a chosen offer to the finding. `null` clears it. */
+export async function selectPartAction(
+  orderId: string,
+  findingId: string,
+  part: PartOffer | null,
+) {
+  await requireAdvisor();
+  setFindingPart(orderId, findingId, part);
+  revalidatePath(`/shop/orders/${orderId}`);
+  return { ok: true as const };
 }
 
 // Repair payment lives in POST /api/checkout/repair — it has to hand back a
