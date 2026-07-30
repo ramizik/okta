@@ -21,6 +21,16 @@
       "requestedAt": "2026-07-30T20:59:34.575Z",
       "status": "complete"
     },
+    "openrouter": {
+      "accountRequestId": "facctrq_61V8Pvv1FlM5uspYo16V8NqlGGSQv2Q0czD5bI2xMJJ2",
+      "configuration": {},
+      "linkedAt": "2026-07-30T21:58:54.724Z",
+      "providerId": "prvdr_61URImmFACEuDHEx651IO",
+      "providerName": "OpenRouter",
+      "redirectUrl": null,
+      "requestedAt": "2026-07-30T21:58:54.724Z",
+      "status": "complete"
+    },
     "vercel": {
       "accountRequestId": "facctrq_61V8PXoMxWO7rbrLk16V8NqlGGSQv2Q0czD5bI2xMDBQ",
       "configuration": {},
@@ -66,6 +76,28 @@
       "providerName": "Auth0",
       "resourceId": "fres_61V8P2VlEkxmm9SED16V8NqlGGSQv2Q0czD5bI2xM0gK",
       "serviceId": "client"
+    },
+    "openrouter-api": {
+      "configuration": {},
+      "createdAt": "2026-07-30T21:59:12.730Z",
+      "lastRevealedAt": "2026-07-30T21:59:13.090Z",
+      "lastStatus": "complete",
+      "name": "openrouter-api",
+      "providerId": "prvdr_61URImmFACEuDHEx651IO",
+      "providerName": "OpenRouter",
+      "resourceId": "fres_61V8PwEJ5mMENM3ZB16V8NqlGGSQv2Q0czD5bI2xMKhc",
+      "serviceId": "api"
+    },
+    "openrouter-plan": {
+      "configuration": {},
+      "createdAt": "2026-07-30T21:58:58.638Z",
+      "lastRevealedAt": "2026-07-30T21:58:59.157Z",
+      "lastStatus": "complete",
+      "name": "openrouter-plan",
+      "providerId": "prvdr_61URImmFACEuDHEx651IO",
+      "providerName": "OpenRouter",
+      "resourceId": "fres_61V8PvzAZQczDPa3B16V8NqlGGSQv2Q0czD5bI2xMBoO",
+      "serviceId": "free"
     },
     "pitcrew": {
       "configuration": {

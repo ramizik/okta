@@ -4,6 +4,9 @@
     "auth0": {
       "name": "Auth0"
     },
+    "openrouter": {
+      "name": "OpenRouter"
+    },
     "vercel": {
       "name": "Vercel"
     }
@@ -18,6 +21,16 @@
       "name": "hackathon-app",
       "providerName": "Auth0",
       "serviceId": "client"
+    },
+    "openrouter-api": {
+      "name": "openrouter-api",
+      "providerName": "OpenRouter",
+      "serviceId": "api"
+    },
+    "openrouter-plan": {
+      "name": "openrouter-plan",
+      "providerName": "OpenRouter",
+      "serviceId": "free"
     },
     "pitcrew": {
       "name": "pitcrew",
