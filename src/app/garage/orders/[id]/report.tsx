@@ -32,6 +32,31 @@ export function CustomerReport({ order }: { order: RepairOrder }) {
   const totalCents = approved.reduce((s, f) => s + f.priceCents, 0);
   const paid = isPaid(order);
 
+  // Toast the outcome of a return trip from Stripe Checkout, once.
+  const searchParams = useSearchParams();
+  const announced = useRef(false);
+  useEffect(() => {
+    if (announced.current) return;
+    const paidFlag = searchParams.get("paid");
+    const canceled = searchParams.get("canceled");
+    if (paidFlag === "1") {
+      announced.current = true;
+      toast.success("Payment received", {
+        description: "Your shop has been notified and work is starting.",
+      });
+    } else if (paidFlag === "0") {
+      announced.current = true;
+      toast.error("We couldn't confirm that payment", {
+        description: "Nothing was charged. You can try again.",
+      });
+    } else if (canceled === "1") {
+      announced.current = true;
+      toast("Checkout canceled", {
+        description: "Your approvals are still saved.",
+      });
+    }
+  }, [searchParams]);
+
   const decide = (findingId: string, value: boolean | null) =>
     startTransition(async () => {
       await setApprovalAction(order.id, findingId, value);
