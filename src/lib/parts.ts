@@ -1,5 +1,6 @@
 import type { Finding, PartOffer, PartSearch, Vehicle } from "./types";
 import { MOCK_PART_OFFERS, MOCK_PART_OFFERS_GENERIC } from "./seed";
+import { catalogByKey, catalogQuery, matchCatalog } from "./catalog";
 
 // Live parts sourcing: a Finding becomes a real, purchasable part list.
 //
@@ -59,6 +60,14 @@ async function buildQuery(
   finding: Finding,
   vehicle: Vehicle,
 ): Promise<{ query: string; source: "live" | "fallback" }> {
+  // Anything on the shop's service menu has a fixed query. The model words
+  // each finding differently every run, so letting it write the query would
+  // search for something slightly different in every demo — this pins it.
+  const entry = catalogByKey(finding.catalogKey) ?? matchCatalog(finding);
+  if (entry?.partsQuery) {
+    return { query: catalogQuery(entry, vehicle), source: "live" };
+  }
+
   const apiKey =
     process.env.OPENROUTER_API_API_KEY ?? process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -128,10 +137,25 @@ function normalizeOffer(
   };
 }
 
-function seededOffers(findingId: string): PartOffer[] {
-  return structuredClone(
-    MOCK_PART_OFFERS[findingId] ?? MOCK_PART_OFFERS_GENERIC,
-  );
+function seededOffers(finding: Finding): PartOffer[] {
+  // Live findings get generated ids (f_gen_3), so fall back through the
+  // catalog entry's seeded key before giving up on the generic offers.
+  const entry = catalogByKey(finding.catalogKey) ?? matchCatalog(finding);
+  const seeded =
+    MOCK_PART_OFFERS[finding.id] ??
+    (entry?.seededKey ? MOCK_PART_OFFERS[entry.seededKey] : undefined) ??
+    MOCK_PART_OFFERS_GENERIC;
+  return structuredClone(seeded);
+}
+
+// Same query, same offers — for the whole run of the dev server. Keeps the
+// parts panel identical across repeated demos and saves SerpApi quota.
+const globalCache = globalThis as unknown as {
+  __pitcrewPartsCache?: Map<string, PartOffer[]>;
+};
+function offerCache(): Map<string, PartOffer[]> {
+  globalCache.__pitcrewPartsCache ??= new Map();
+  return globalCache.__pitcrewPartsCache;
 }
 
 /**
@@ -145,10 +169,15 @@ export async function searchPartsForFinding(
 ): Promise<PartSearch> {
   const { query } = await buildQuery(finding, vehicle);
 
+  const cached = offerCache().get(query);
+  if (cached) {
+    return { query, offers: structuredClone(cached), source: "live" };
+  }
+
   const apiKey = process.env.SERPAPI_API_KEY;
   if (!apiKey) {
     console.warn("[parts] SERPAPI_API_KEY missing; serving seeded offers");
-    return { query, offers: seededOffers(finding.id), source: "fallback" };
+    return { query, offers: seededOffers(finding), source: "fallback" };
   }
 
   try {
@@ -179,9 +208,10 @@ export async function searchPartsForFinding(
       .slice(0, MAX_OFFERS);
 
     if (offers.length === 0) throw new Error("no usable results");
+    offerCache().set(query, structuredClone(offers));
     return { query, offers, source: "live" };
   } catch (err) {
     console.warn("[parts] search failed:", (err as Error).message);
-    return { query, offers: seededOffers(finding.id), source: "fallback" };
+    return { query, offers: seededOffers(finding), source: "fallback" };
   }
 }

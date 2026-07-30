@@ -1,5 +1,6 @@
 import type { Report, Severity, Vehicle, Verdict } from "./types";
 import { MOCK_HERO_REPORT } from "./seed";
+import { priceFindings } from "./catalog";
 
 // LLM report generation via OpenRouter (provisioned through Stripe Projects).
 // Demo rule: this function NEVER throws and never takes longer than ~12s —
@@ -57,7 +58,10 @@ function parseReport(content: string): Report | null {
       ? (raw.verdict as Verdict)
       : "SERVICE_SOON",
     summary: raw.summary,
-    findings: raw.items
+    // The model is forbidden from inventing prices, so a live report arrives
+    // entirely at $0. The shop's own service menu prices it — see catalog.ts.
+    findings: priceFindings(
+      raw.items
       .filter((i) => i.title && i.plain)
       .map((i, idx) => ({
         id: `f_gen_${idx}`,
@@ -75,6 +79,7 @@ function parseReport(content: string): Report | null {
             : 0,
         approved: null,
       })),
+    ),
   };
 }
 

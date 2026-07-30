@@ -25,6 +25,7 @@ export interface Finding {
   priceCents: number;
   approved: boolean | null; // null = not yet answered
   selectedPart?: PartOffer; // advisor-sourced part for this repair
+  catalogKey?: string; // shop service menu entry — prices it and fixes its parts query
 }
 
 /** A purchasable part matched to a Finding — sourced live from the web. */
