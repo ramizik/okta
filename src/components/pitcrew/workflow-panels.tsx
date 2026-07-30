@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   CheckCircle2,
   Circle,
@@ -12,6 +13,8 @@ import { formatUsd } from "@/lib/format";
 import {
   SHOP_PHONE,
   aiSummary,
+  checkInPhotos,
+  inspectionSteps,
   partsPurchased,
   repairTasks,
   techReports,
@@ -160,6 +163,84 @@ export function InProgressPanel({ order }: { order: RepairOrder }) {
             </a>
           </Button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** Customer-side view of the check-in step: photos taken when the car arrived. */
+export function CheckInPhotosPanel() {
+  return (
+    <div>
+      <p className="label-caps">Photos taken at drop-off</p>
+      <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {checkInPhotos.map((p) => (
+          <figure
+            key={p.id}
+            className="overflow-hidden rounded-lg border border-border bg-card"
+          >
+            <Image
+              src={p.src}
+              alt={p.alt}
+              width={1024}
+              height={768}
+              loading="lazy"
+              className="h-24 w-full object-cover"
+            />
+            <figcaption className="px-2 py-1.5 text-[12px] leading-snug text-muted-foreground">
+              {p.caption}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      <p className="mt-3 text-[13px] text-muted-foreground">
+        We photograph every vehicle on arrival so there&apos;s a shared record
+        of its condition.
+      </p>
+    </div>
+  );
+}
+
+/** Customer-side view of the inspection step: which checks are done, active or pending. */
+export function InspectionProgressPanel() {
+  const done = inspectionSteps.filter((s) => s.state === "done").length;
+
+  return (
+    <div>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+        <p className="label-caps">Inspection checklist</p>
+        <span className="tnum text-[13px] text-muted-foreground">
+          {done} of {inspectionSteps.length} complete
+        </span>
+      </div>
+      <div className="mt-2 space-y-2">
+        {inspectionSteps.map((s) => (
+          <div key={s.id} className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2.5">
+            <span className="mt-0.5">
+              {s.state === "done" ? (
+                <CheckCircle2 className="h-4 w-4 text-sev-green-fg" />
+              ) : s.state === "active" ? (
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              ) : (
+                <Circle className="h-4 w-4 text-muted-foreground" />
+              )}
+            </span>
+            <div className="min-w-0">
+              <p className={cn("text-sm", s.state === "active" && "font-semibold")}>
+                {s.label}
+                <span className="ml-2 text-[13px] font-normal text-muted-foreground">
+                  {s.tech}
+                </span>
+              </p>
+              <p className="text-[13px] leading-snug text-muted-foreground">
+                {s.detail}
+              </p>
+            </div>
+            <span className="tnum shrink-0 text-[12px] text-muted-foreground">
+              {s.time}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

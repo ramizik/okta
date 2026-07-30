@@ -275,6 +275,93 @@ export const serviceHistory = [
   },
 ];
 
+export const checkInPhotos = [
+  {
+    id: "p1",
+    src: "/checkin/checkin-front.jpg",
+    alt: "Front three-quarter view of the vehicle at check-in",
+    caption: "Front · no new damage",
+  },
+  {
+    id: "p2",
+    src: "/checkin/checkin-tire.jpg",
+    alt: "Front driver-side tire and wheel at check-in",
+    caption: "Front tires · 4/32in tread",
+  },
+  {
+    id: "p3",
+    src: "/checkin/checkin-dash.jpg",
+    alt: "Instrument cluster showing the check engine light",
+    caption: "Cluster · check engine light on",
+  },
+  {
+    id: "p4",
+    src: "/checkin/checkin-engine.jpg",
+    alt: "Open engine bay at check-in",
+    caption: "Engine bay · fluids logged",
+  },
+];
+
+export type InspectionState = "done" | "active" | "pending";
+
+export const inspectionSteps: {
+  id: string;
+  label: string;
+  tech: string;
+  state: InspectionState;
+  detail: string;
+  time: string;
+}[] = [
+  {
+    id: "i1",
+    label: "Road test & symptom check",
+    tech: "Luis Ferrer",
+    state: "done",
+    detail: "Rough idle confirmed at stops, no misfire above 2k rpm.",
+    time: "8:40 AM",
+  },
+  {
+    id: "i2",
+    label: "Diagnostic scan",
+    tech: "Priya Raman",
+    state: "done",
+    detail: "P0302 stored. Live data pulled for cylinder 2.",
+    time: "9:02 AM",
+  },
+  {
+    id: "i3",
+    label: "Brakes & tires",
+    tech: "Danny Ruiz",
+    state: "done",
+    detail: "Front pads 3mm, tread 4/32in across the front axle.",
+    time: "9:25 AM",
+  },
+  {
+    id: "i4",
+    label: "Fluids, battery & charging",
+    tech: "Danny Ruiz",
+    state: "active",
+    detail: "Battery load test running, coolant and brake fluid sampled.",
+    time: "in progress",
+  },
+  {
+    id: "i5",
+    label: "Suspension & undercarriage",
+    tech: "Luis Ferrer",
+    state: "pending",
+    detail: "Lift inspection of bushings, boots and exhaust hangers.",
+    time: "next",
+  },
+  {
+    id: "i6",
+    label: "Advisor review & pricing",
+    tech: "Sarah Mitchell",
+    state: "pending",
+    detail: "Findings priced and written up for your report.",
+    time: "~10:15 AM",
+  },
+];
+
 export const SHOP_PHONE = "(209) 555-0100";
 
 export function vehicleName(order: RepairOrder): string {

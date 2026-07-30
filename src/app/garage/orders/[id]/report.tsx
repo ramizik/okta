@@ -8,7 +8,11 @@ import { toast } from "sonner";
 import { FindingCard } from "@/components/pitcrew/finding-card";
 import { EmptyState } from "@/components/pitcrew/primitives";
 import { StatusStepper, VerdictBadge } from "@/components/pitcrew/status";
-import { InProgressPanel } from "@/components/pitcrew/workflow-panels";
+import {
+  CheckInPhotosPanel,
+  InProgressPanel,
+  InspectionProgressPanel,
+} from "@/components/pitcrew/workflow-panels";
 import { Button } from "@/components/ui/button";
 import { formatUsd } from "@/lib/format";
 import { bySeverity, isPaid, vehicleName } from "@/lib/pitcrew-ui";
@@ -67,7 +71,11 @@ export function CustomerReport({ order }: { order: RepairOrder }) {
             status={order.status}
             audience="customer"
             interactive
-            detailOverrides={{ IN_PROGRESS: <InProgressPanel order={order} /> }}
+            detailOverrides={{
+              CHECKED_IN: <CheckInPhotosPanel />,
+              INSPECTION_COMPLETE: <InspectionProgressPanel />,
+              IN_PROGRESS: <InProgressPanel order={order} />,
+            }}
           />
         </div>
 

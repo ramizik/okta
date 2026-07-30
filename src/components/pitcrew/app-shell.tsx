@@ -95,12 +95,6 @@ export function RoleSwitchHint({ email }: { email?: string }) {
         >
           Switch user
         </a>
-        <Link
-          href="/pricing"
-          className="underline underline-offset-4 hover:opacity-80"
-        >
-          Pricing
-        </Link>
         <a
           href="/api/demo/reset"
           className="underline underline-offset-4 hover:opacity-80"
