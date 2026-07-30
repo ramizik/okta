@@ -42,5 +42,50 @@
       "providerName": "Vercel",
       "serviceId": "hobby"
     }
+  },
+  "environments": {
+    "default": {
+      "output": ".env",
+      "resources": [
+        {
+          "resourceName": "auth0-plan"
+        },
+        {
+          "resourceName": "hackathon-app"
+        },
+        {
+          "resourceName": "openrouter-api"
+        },
+        {
+          "resourceName": "openrouter-plan"
+        },
+        {
+          "resourceName": "pitcrew"
+        },
+        {
+          "resourceName": "vercel-plan"
+        }
+      ],
+      "variables": [
+        {
+          "variableName": "app-base-url",
+          "envKey": "APP_BASE_URL"
+        },
+        {
+          "variableName": "auth0-secret",
+          "envKey": "AUTH0_SECRET"
+        }
+      ]
+    }
+  },
+  "variables": {
+    "app-base-url": {
+      "name": "app-base-url",
+      "backendId": "fprjvar_61V8QH3Qkug0nW0SG16V8NqlGGSQv2Q0czD5bI2xM2QK"
+    },
+    "auth0-secret": {
+      "name": "auth0-secret",
+      "backendId": "fprjvar_61V8QH0QptfZdnAHf16V8NqlGGSQv2Q0czD5bI2xM6Zs"
+    }
   }
 }

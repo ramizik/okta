@@ -59,17 +59,25 @@
         "name": "hackathon-app",
         "app_type": "regular_web",
         "callbacks": [
-          "http://localhost:3000/api/auth/callback"
+          "http://localhost:3000/auth/callback",
+          "https://pitcrew-woad.vercel.app/auth/callback"
         ],
         "allowed_logout_urls": [
-          "http://localhost:3000"
+          "http://localhost:3000",
+          "https://pitcrew-woad.vercel.app"
         ],
         "web_origins": [
-          "http://localhost:3000"
+          "http://localhost:3000",
+          "https://pitcrew-woad.vercel.app"
+        ],
+        "oidc_conformant": true,
+        "grant_types": [
+          "authorization_code",
+          "refresh_token"
         ]
       },
       "createdAt": "2026-07-30T21:01:42.059Z",
-      "lastRevealedAt": "2026-07-30T21:01:42.377Z",
+      "lastRevealedAt": "2026-07-30T22:27:04.943Z",
       "lastStatus": "complete",
       "name": "hackathon-app",
       "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
@@ -123,5 +131,11 @@
       "resourceId": "fres_61V8PXsK6QX1GRDFh16V8NqlGGSQv2Q0czD5bI2xMWci",
       "serviceId": "hobby"
     }
+  },
+  "managedProjectVariableEnvKeys": {
+    ".env": [
+      "APP_BASE_URL",
+      "AUTH0_SECRET"
+    ]
   }
 }

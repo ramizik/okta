@@ -15,7 +15,7 @@ export default function Landing() {
               Pricing
             </Link>
             <Button asChild size="sm">
-              <Link href="/shop">Sign in</Link>
+              <a href="/auth/login?returnTo=/shop">Sign in</a>
             </Button>
           </div>
         </div>
@@ -32,7 +32,7 @@ export default function Landing() {
         </p>
         <div className="mt-10 flex items-center justify-center gap-4">
           <Button asChild size="lg">
-            <Link href="/shop">Sign in</Link>
+            <a href="/auth/login?returnTo=/shop">Sign in</a>
           </Button>
           <Button asChild size="lg" variant="outline">
             <Link href="/pricing">See pricing</Link>
