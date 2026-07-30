@@ -3,6 +3,9 @@
   "providers": {
     "auth0": {
       "name": "Auth0"
+    },
+    "vercel": {
+      "name": "Vercel"
     }
   },
   "resources": {
@@ -15,6 +18,16 @@
       "name": "hackathon-app",
       "providerName": "Auth0",
       "serviceId": "client"
+    },
+    "pitcrew": {
+      "name": "pitcrew",
+      "providerName": "Vercel",
+      "serviceId": "project"
+    },
+    "vercel-plan": {
+      "name": "vercel-plan",
+      "providerName": "Vercel",
+      "serviceId": "hobby"
     }
   }
 }

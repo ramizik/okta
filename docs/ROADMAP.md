@@ -175,8 +175,20 @@ Only after everything above is green.
 - [ ] 🔴 Test with the network throttled / AI key removed — the fallback report must still render
 - [ ] 🔴 Open two browser profiles side by side ahead of time, both pre-logged-in
 - [ ] 🔴 Screenshot every key screen as a backup in case something breaks live
-- [ ] 🟡 Deploy to Vercel as a backup URL (set Auth0 callbacks + `APP_BASE_URL` for the prod domain)
 - [ ] 🔴 Final commit + push
+
+### Vercel deploy (provisioned — `vercel/project` "pitcrew" on the hobby plan)
+
+Do this **once early** (a throwaway deploy right after Phase 0) so build problems surface
+while there's still time, then re-deploy at the end.
+
+- [ ] 🟡 `export VERCEL_TOKEN=$(grep '^VERCEL_TOKEN=' .env | cut -d= -f2-)` — never pass `--token` on the command line
+- [ ] 🟡 `export VERCEL_ORG_ID=...` and `VERCEL_PROJECT_ID=...` from `.env` (both or neither)
+- [ ] 🟡 `vercel link --repo -y` then `vercel deploy -y` (preview) — confirm the build is green
+- [ ] 🟡 Push env vars to Vercel: `AUTH0_*`, `AUTH0_SECRET`, `APP_BASE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `ANTHROPIC_API_KEY`
+- [ ] 🟡 Add the Vercel domain to Auth0 Allowed Callback / Logout / Web Origins
+- [ ] 🟡 Set `APP_BASE_URL` to the Vercel domain in the Vercel env (not localhost)
+- [ ] ⚪ Point a real Stripe webhook endpoint at `https://<vercel-domain>/api/webhooks/stripe` — a public HTTPS URL means no `stripe listen` needed
 
 ---
 

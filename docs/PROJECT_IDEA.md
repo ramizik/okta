@@ -201,11 +201,17 @@ Both are visible on screen in the demo. Test mode, test cards.
 | Payments | `stripe` node SDK + Checkout Sessions | Hosted UI = zero payment-form bugs on stage |
 | AI | `@anthropic-ai/sdk`, claude-sonnet-5, tool-schema output | Structured, reliable, fast |
 | Data | In-memory store on `globalThis`, seeded at boot | No DB setup, no migrations, resets clean between demos |
-| Deploy | Local `next dev` for the demo; Vercel as backup | Single process = state actually persists during the demo |
+| Deploy | **Vercel** (`vercel/project` via Stripe Projects, hobby plan) | Provisioned; git-push auto-deploys, real HTTPS URL for Stripe webhooks |
 
-**Known tradeoff:** the in-memory store means state is per-process. That's *good* for a
-local demo (deterministic, resettable) and acceptable on Vercel for a single session.
-A `POST /api/demo/reset` endpoint restores seed state between run-throughs.
+**Known tradeoff:** the in-memory store is per-process. On local `next dev` that's a single
+process and state is rock solid. On Vercel, serverless instances can recycle and drop state
+mid-demo. **Therefore: drive the live demo from local `next dev`; the Vercel URL is the
+backup and the proof that it's a really deployed SaaS.** A `POST /api/demo/reset` endpoint
+restores seed state between run-throughs on either.
+
+If the deployed URL needs to survive a full demo, the escape hatch is swapping `store.ts`
+for a Postgres-backed implementation (`stripe projects add` has database providers) — but
+only if the core flow is finished with time to spare. Do not start there.
 
 ---
 

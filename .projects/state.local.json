@@ -20,6 +20,16 @@
       "redirectUrl": null,
       "requestedAt": "2026-07-30T20:59:34.575Z",
       "status": "complete"
+    },
+    "vercel": {
+      "accountRequestId": "facctrq_61V8PXoMxWO7rbrLk16V8NqlGGSQv2Q0czD5bI2xMDBQ",
+      "configuration": {},
+      "linkedAt": "2026-07-30T21:33:59.592Z",
+      "providerId": "prvdr_61ULUAr4zlQgZkvXY5LsG",
+      "providerName": "Vercel",
+      "redirectUrl": null,
+      "requestedAt": "2026-07-30T21:33:59.592Z",
+      "status": "complete"
     }
   },
   "resources": {
@@ -56,6 +66,30 @@
       "providerName": "Auth0",
       "resourceId": "fres_61V8P2VlEkxmm9SED16V8NqlGGSQv2Q0czD5bI2xM0gK",
       "serviceId": "client"
+    },
+    "pitcrew": {
+      "configuration": {
+        "name": "pitcrew"
+      },
+      "createdAt": "2026-07-30T21:34:08.406Z",
+      "lastRevealedAt": "2026-07-30T21:34:08.705Z",
+      "lastStatus": "complete",
+      "name": "pitcrew",
+      "providerId": "prvdr_61ULUAr4zlQgZkvXY5LsG",
+      "providerName": "Vercel",
+      "resourceId": "fres_61V8PXyKErlJbZbBg16V8NqlGGSQv2Q0czD5bI2xMVvk",
+      "serviceId": "project"
+    },
+    "vercel-plan": {
+      "configuration": {},
+      "createdAt": "2026-07-30T21:34:01.953Z",
+      "lastRevealedAt": "2026-07-30T21:34:02.391Z",
+      "lastStatus": "complete",
+      "name": "vercel-plan",
+      "providerId": "prvdr_61ULUAr4zlQgZkvXY5LsG",
+      "providerName": "Vercel",
+      "resourceId": "fres_61V8PXsK6QX1GRDFh16V8NqlGGSQv2Q0czD5bI2xMWci",
+      "serviceId": "hobby"
     }
   }
 }
