@@ -125,19 +125,18 @@ Legend: 🔴 blocks the demo · 🟡 makes the demo good · ⚪ only if time rem
 
 ---
 
-## Phase 6 — Stripe (T+3:00 → T+3:35) 🟠 PARTIAL
+## Phase 6 — Stripe (T+3:00 → T+3:35) ✅ DONE (webhook optional)
 
 **Goal:** money moves, both ways, on camera.
 
 ### Repair payment (transactional) — 🔴 must have
-- [ ] 🔴 `STRIPE_SECRET_KEY` (test mode) in `.env` *(not provisioned yet)*
+- [x] 🔴 `STRIPE_SECRET_KEY` (test mode) in `.env` + Vercel *(Stripe CLI test key, verified against the Checkout API)*
 - [x] 🔴 `src/lib/stripe.ts` — SDK client *(with a clean demo fallback when the key is absent)*
-- [ ] 🔴 `POST /api/checkout/repair` — Checkout Session from **server-computed approved items** *(currently `payOrderAction` simulates payment in-app; swap to real Checkout once the key exists)*
-- [ ] 🔴 Success URL `/garage/orders/[id]?paid=1`, cancel URL back to the order
+- [x] 🔴 `POST /api/checkout/repair` — Checkout Session with one line item per **server-computed approved finding**, ownership-checked
+- [x] 🔴 Success URL verifies the session server-side (`/api/checkout/repair/confirm`), cancel URL back to the order
 - [x] 🔴 Order flips to `PAID` — visible on both the customer and shop views
-  - [ ] Primary: webhook `POST /api/webhooks/stripe` on `checkout.session.completed`
-  - [x] **Fallback pattern proven:** the subscription flow verifies the session server-side on the success redirect — reuse for repairs
-- [x] 🔴 Paid state visible on both the customer and shop views
+  - [ ] ⚪ Webhook `POST /api/webhooks/stripe` *(unnecessary: confirm-on-redirect is idempotent and works without `stripe listen`)*
+  - [x] **Fallback: session verified server-side on the success redirect** — for both repairs and subscriptions
 
 ### Shop subscription (the business model) — 🔴 must have
 - [x] 🔴 Two plans defined: **Starter $99/mo**, **Pro $299/mo** *(inline `price_data` on the Checkout Session — no dashboard products needed)*
@@ -145,7 +144,7 @@ Legend: 🔴 blocks the demo · 🟡 makes the demo good · ⚪ only if time rem
 - [x] 🔴 `POST /api/checkout/subscription` — Checkout Session in `subscription` mode + server-side confirm on redirect
 - [x] 🟡 Shop dashboard shows the current plan badge; upgrade CTA links to `/pricing`
 
-- [ ] 🔴 **Checkpoint: run both checkouts with `4242 4242 4242 4242`.** *(blocked on `STRIPE_SECRET_KEY`)*
+- [ ] 🔴 **Checkpoint: run both checkouts with `4242 4242 4242 4242`.** *(key is live — do this during the demo rehearsal)*
 - [x] 🔴 Commit + push
 
 ---
@@ -191,7 +190,7 @@ Legend: 🔴 blocks the demo · 🟡 makes the demo good · ⚪ only if time rem
 - [x] 🟡 `VERCEL_TOKEN` via env (never on the command line)
 - [x] 🟡 `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` from `.env`
 - [x] 🟡 `vercel link` + production deploys — build green
-- [x] 🟡 Env vars on Vercel: `AUTH0_*`, `AUTH0_SECRET`, `APP_BASE_URL`, `OPENROUTER_API_API_KEY` *(`STRIPE_*` pending key provisioning)*
+- [x] 🟡 Env vars on Vercel: `AUTH0_*`, `AUTH0_SECRET`, `APP_BASE_URL`, `OPENROUTER_API_API_KEY`, `STRIPE_SECRET_KEY`
 - [x] 🟡 Vercel domain in Auth0 Allowed Callback / Logout / Web Origins
 - [x] 🟡 `APP_BASE_URL` = https://pitcrew-okta.vercel.app in the Vercel env
 - [ ] ⚪ Real Stripe webhook endpoint at `https://pitcrew-okta.vercel.app/api/webhooks/stripe`

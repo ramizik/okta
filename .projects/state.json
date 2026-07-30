@@ -74,6 +74,10 @@
         {
           "variableName": "auth0-secret",
           "envKey": "AUTH0_SECRET"
+        },
+        {
+          "variableName": "stripe-secret-key",
+          "envKey": "STRIPE_SECRET_KEY"
         }
       ]
     }
@@ -86,6 +90,10 @@
     "auth0-secret": {
       "name": "auth0-secret",
       "backendId": "fprjvar_61V8QH0QptfZdnAHf16V8NqlGGSQv2Q0czD5bI2xM6Zs"
+    },
+    "stripe-secret-key": {
+      "name": "stripe-secret-key",
+      "backendId": "fprjvar_61V8RHrIKnfSsJfwj16V8NqlGGSQv2Q0czD5bI2xMN8i"
     }
   }
 }
