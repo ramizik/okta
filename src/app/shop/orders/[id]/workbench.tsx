@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { FindingCard } from "@/components/pitcrew/finding-card";
+import { PartsSourcing } from "@/components/pitcrew/parts-sourcing";
 import { EmptyState } from "@/components/pitcrew/primitives";
 import {
   SeverityDot,
@@ -221,13 +222,16 @@ export function OrderWorkbench({ order }: { order: RepairOrder }) {
             {priced.map((f) => (
               <div
                 key={f.id}
-                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-border px-6 py-3 last:border-0"
+                className="border-b border-border px-6 py-3 last:border-0"
               >
-                <SeverityDot severity={f.severity} />
-                <span className="truncate text-[15px]">{f.title}</span>
-                <span className="tnum shrink-0 font-medium">
-                  {formatUsd(f.priceCents)}
-                </span>
+                <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
+                  <SeverityDot severity={f.severity} />
+                  <span className="truncate text-[15px]">{f.title}</span>
+                  <span className="tnum shrink-0 font-medium">
+                    {formatUsd(f.priceCents)}
+                  </span>
+                </div>
+                <PartsSourcing order={order} finding={f} />
               </div>
             ))}
             <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 px-6 py-4">
