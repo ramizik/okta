@@ -379,32 +379,117 @@ export function buildSeedOrders(): RepairOrder[] {
         photoUrl: "/vehicles/rav4.jpg",
       },
       status: "AWAITING_APPROVAL",
-      rawTechNotes:
-        "Front brake pads at 3mm, rotors lipped. Rear pads 6mm ok. Tires 5/32 all around. Recommend front pads and rotors.",
+      rawTechNotes: `MULTI-POINT INSPECTION — 38,450 MI
+
+[RED] Brakes front
+Technician Note: Front pads 3mm, rotors lipped and scored. Rear pads 6mm ok. Recommend front pads + rotors, machine not possible below min thickness.
+
+[RED] Battery / charging
+Technician Note: Battery load test FAIL. 9.4V under load, spec 9.6 min. Cranking slow on cold start. Alt output 14.1V ok. Batt date code 3 yr.
+
+[YELLOW] Cabin air filter
+Technician Note: Filter loaded w/ debris, airflow restricted. Due per mileage.
+
+[YELLOW] Rear wiper
+Technician Note: Rear blade torn, streaking. Fronts ok.
+
+[GREEN] Tires — 5/32 even wear all four, pressures set 35psi
+[GREEN] Engine oil — clean, within interval
+[GREEN] Coolant / brake fluid — level and condition ok
+[GREEN] Exterior lighting — all functional
+[GREEN] Suspension — no play, boots intact`,
       report: {
         verdict: "SERVICE_SOON",
         summary:
-          "Your RAV4 is fine for now, but the front brakes are getting thin and should be replaced soon.",
+          "Your RAV4 is safe to drive, but two things need attention: the front brakes are down to their last quarter, and the battery failed its load test and is likely to leave you stranded on a cold morning. Two smaller comfort items can wait if you'd rather split the cost.",
         findings: [
           {
             id: "f_r2_brakes",
-            severity: "amber",
-            title: "Front brake pads are wearing thin",
+            catalogKey: "front_brakes",
+            severity: "red",
+            title: "Front brakes are down to 3mm",
             plain:
-              "Your front brake pads are down to about 25% of their material, and the discs they press against have a worn lip.",
+              "Your front brake pads are down to about 25% of their material, and the discs they press against are scored with a worn lip. Both need replacing together.",
             youllNotice:
-              "Possibly a faint squeal when braking. Stopping still feels normal.",
+              "A faint squeal when braking. Stopping still feels normal for now.",
             ifYouWait:
               "Pads wear through to metal, which ruins the discs and roughly doubles the repair cost.",
-            urgency: "Within the next few weeks.",
+            urgency: "Within the next two weeks.",
             priceCents: 31200,
+            approved: null,
+          },
+          {
+            id: "f_r2_battery",
+            catalogKey: "battery",
+            severity: "red",
+            title: "Battery failed its load test",
+            plain:
+              "Your battery holds a charge at rest but collapses under load — it measured 9.4 volts against a 9.6 volt minimum. It's three years old, which is about when they go.",
+            youllNotice:
+              "The engine cranks slowly on cold mornings before it catches.",
+            ifYouWait:
+              "It will eventually not start at all, usually on the coldest morning of the year.",
+            urgency: "Before the next cold snap.",
+            priceCents: 24500,
+            approved: null,
+          },
+          {
+            id: "f_r2_cabin_filter",
+            catalogKey: "cabin_filter",
+            severity: "amber",
+            title: "Cabin air filter is clogged",
+            plain:
+              "The filter that cleans the air coming into your cabin is packed with road debris and is restricting airflow.",
+            youllNotice:
+              "Weaker airflow from the vents and a musty smell when the fan is on.",
+            ifYouWait: "Nothing breaks — the air just stays stuffy.",
+            urgency: "Whenever it's convenient.",
+            priceCents: 8900,
+            approved: null,
+          },
+          {
+            id: "f_r2_wiper",
+            catalogKey: "wipers",
+            severity: "amber",
+            title: "Rear wiper blade is torn",
+            plain:
+              "The rubber on your rear blade has split, so it smears instead of clearing. Your front blades are fine.",
+            youllNotice: "Streaking across the rear glass in the rain.",
+            ifYouWait: "A torn blade can eventually scratch the glass.",
+            urgency: "Before the next rain.",
+            priceCents: 3400,
             approved: null,
           },
           {
             id: "f_r2_tires",
             severity: "green",
             title: "Tires",
-            plain: "All four tires have healthy tread remaining.",
+            plain:
+              "All four tires have healthy tread at 5/32in with even wear. Pressures set to 35 psi.",
+            youllNotice: "",
+            ifYouWait: "",
+            urgency: "No action needed.",
+            priceCents: 0,
+            approved: null,
+          },
+          {
+            id: "f_r2_fluids",
+            severity: "green",
+            title: "Oil, coolant and brake fluid",
+            plain:
+              "Oil is clean and within its interval. Coolant and brake fluid are at level and in good condition.",
+            youllNotice: "",
+            ifYouWait: "",
+            urgency: "No action needed.",
+            priceCents: 0,
+            approved: null,
+          },
+          {
+            id: "f_r2_suspension",
+            severity: "green",
+            title: "Suspension and lighting",
+            plain:
+              "No play in the front end, all boots intact, and every exterior light works.",
             youllNotice: "",
             ifYouWait: "",
             urgency: "No action needed.",
@@ -424,13 +509,14 @@ export function buildSeedOrders(): RepairOrder[] {
           at: minsAgo(160),
           actor: "Dee Alvarez, brake & chassis technician",
           label: "Inspection completed",
-          detail: "Front pads measured at 3mm, rotors lipped · tires 5/32 all round",
+          detail:
+            "Front pads at 3mm with lipped rotors · battery failed load test at 9.4V",
         },
         {
           at: minsAgo(140),
           actor: "PitCrew AI",
           label: "Inspection report written",
-          detail: "2 findings from the technician's notes · verdict service soon",
+          detail: "7 findings from the technician's notes · verdict service soon",
         },
         {
           at: minsAgo(18),
@@ -469,6 +555,7 @@ export function buildSeedOrders(): RepairOrder[] {
         findings: [
           {
             id: "f_r3_pump",
+            catalogKey: "water_pump",
             severity: "red",
             title: "Water pump is leaking coolant",
             plain:
@@ -496,6 +583,7 @@ export function buildSeedOrders(): RepairOrder[] {
           },
           {
             id: "f_r3_belt",
+            catalogKey: "drive_belt",
             severity: "amber",
             title: "Serpentine belt is glazed",
             plain:
@@ -609,30 +697,134 @@ export function buildSeedOrders(): RepairOrder[] {
         photoUrl: "",
       },
       status: "READY",
-      rawTechNotes:
-        "60k service complete. Oil, filters, tire rotation, brake inspection all done. No issues found.",
+      rawTechNotes: `60K MILE SERVICE — 51,377 MI
+
+[RED] Engine oil & filter
+Technician Note: Due per interval. 5W-30 full synthetic, OEM filter. Drain plug washer replaced.
+
+[YELLOW] Engine + cabin air filters
+Technician Note: Both loaded. Engine filter grey, cabin filter debris packed. Replaced both.
+
+[YELLOW] Tires
+Technician Note: 6/32 front 7/32 rear, slight front shoulder wear. Rotated F/R and rebalanced. Pressures 33psi.
+
+[YELLOW] Rear wiper
+Technician Note: Blade chattering, rubber hardened. Customer declined, wants to source own.
+
+[GREEN] Brakes — pads F 8mm R 9mm, rotors within spec, no lip
+[GREEN] Battery/charging — 12.6V rest, 14.3V under load, batt 2 yr
+[GREEN] Coolant / trans / brake fluid — level and condition ok
+[GREEN] Drive belt & hoses — no cracking, tension ok
+[GREEN] Road test — no codes, no pull, no noise`,
       report: {
         verdict: "SAFE_TO_DRIVE",
         summary:
-          "Your Outback's 60,000-mile service is complete and everything checked out. You're good to go.",
+          "Your Outback's 60,000-mile service is done and the car is in good shape — brakes, battery, belts and fluids all passed. You approved three items and declined the rear wiper blade, which is the only thing still outstanding.",
         findings: [
           {
-            id: "f_r4_service",
-            severity: "green",
-            title: "60,000-mile service completed",
+            id: "f_r4_oil",
+            catalogKey: "oil_service",
+            severity: "red",
+            title: "Engine oil and filter service",
             plain:
-              "Oil and filters changed, tires rotated, brakes inspected. Everything looks healthy.",
+              "Your oil was past its interval. We drained it, fitted a new OEM filter and refilled with 5W-30 full synthetic.",
+            youllNotice: "Quieter engine, especially on cold starts.",
+            ifYouWait: "",
+            urgency: "Completed on this visit.",
+            priceCents: 12900,
+            approved: true,
+          },
+          {
+            id: "f_r4_filters",
+            catalogKey: "cabin_filter",
+            severity: "amber",
+            title: "Engine and cabin air filters replaced",
+            plain:
+              "Both filters were loaded with debris — the engine one restricts power and economy, the cabin one restricts your vents. Both replaced.",
+            youllNotice: "Stronger airflow from the vents, fresher cabin air.",
+            ifYouWait: "",
+            urgency: "Completed on this visit.",
+            priceCents: 8900,
+            approved: true,
+          },
+          {
+            id: "f_r4_tires",
+            severity: "amber",
+            title: "Tire rotation and rebalance",
+            plain:
+              "Your front tires were wearing on the shoulders. We moved them front-to-rear and rebalanced all four so they wear evenly from here.",
+            youllNotice: "Less vibration at highway speed.",
+            ifYouWait: "",
+            urgency: "Completed on this visit.",
+            priceCents: 7900,
+            approved: true,
+          },
+          {
+            id: "f_r4_wiper",
+            catalogKey: "wipers",
+            severity: "amber",
+            title: "Rear wiper blade is hardened",
+            plain:
+              "The rubber on your rear blade has gone hard and chatters across the glass instead of clearing it.",
+            youllNotice: "Juddering and streaking on the rear window in rain.",
+            ifYouWait: "A hardened blade can eventually scratch the glass.",
+            urgency: "Before the next rain.",
+            priceCents: 3400,
+            approved: false,
+          },
+          {
+            id: "f_r4_brakes",
+            severity: "green",
+            title: "Brakes",
+            plain:
+              "Front pads at 8mm, rears at 9mm, rotors within spec with no lip. Plenty of life left.",
             youllNotice: "",
             ifYouWait: "",
             urgency: "No action needed.",
-            priceCents: 24900,
-            approved: true,
+            priceCents: 0,
+            approved: null,
+          },
+          {
+            id: "f_r4_battery",
+            severity: "green",
+            title: "Battery and charging",
+            plain:
+              "Battery reads 12.6V at rest and the alternator holds 14.3V under load. Both healthy.",
+            youllNotice: "",
+            ifYouWait: "",
+            urgency: "No action needed.",
+            priceCents: 0,
+            approved: null,
+          },
+          {
+            id: "f_r4_belts",
+            severity: "green",
+            title: "Belts, hoses and fluids",
+            plain:
+              "Drive belt shows no cracking, hoses are sound, and coolant, transmission and brake fluid are all at level and in good condition.",
+            youllNotice: "",
+            ifYouWait: "",
+            urgency: "No action needed.",
+            priceCents: 0,
+            approved: null,
+          },
+          {
+            id: "f_r4_roadtest",
+            severity: "green",
+            title: "Road test",
+            plain:
+              "Test driven after the work: no stored codes, no pulling, no new noises.",
+            youllNotice: "",
+            ifYouWait: "",
+            urgency: "No action needed.",
+            priceCents: 0,
+            approved: null,
           },
         ],
       },
       payment: {
         at: minsAgo(60 * 27),
-        amountCents: 24900,
+        amountCents: 29700,
         processor: "Stripe",
         reference: "cs_demo_outback_ro004",
       },
@@ -647,13 +839,14 @@ export function buildSeedOrders(): RepairOrder[] {
           at: minsAgo(60 * 29),
           actor: "Dee Alvarez, brake & chassis technician",
           label: "Inspection completed",
-          detail: "27-point inspection · no faults found, brakes and tires within spec",
+          detail:
+            "27-point inspection · oil past interval, both air filters loaded, front shoulder wear",
         },
         {
           at: minsAgo(60 * 28),
           actor: "PitCrew AI",
           label: "Inspection report written",
-          detail: "1 finding from the technician's notes · verdict safe to drive",
+          detail: "8 findings from the technician's notes · verdict safe to drive",
         },
         {
           at: minsAgo(60 * 28),
@@ -665,13 +858,31 @@ export function buildSeedOrders(): RepairOrder[] {
           at: minsAgo(60 * 27),
           actor: "Tom Whitfield, customer",
           label: "Approved a repair",
-          detail: "60,000-mile service completed — 249.00 USD",
+          detail: "Engine oil and filter service — 129.00 USD",
+        },
+        {
+          at: minsAgo(60 * 27),
+          actor: "Tom Whitfield, customer",
+          label: "Approved a repair",
+          detail: "Engine and cabin air filters replaced — 89.00 USD",
+        },
+        {
+          at: minsAgo(60 * 27),
+          actor: "Tom Whitfield, customer",
+          label: "Approved a repair",
+          detail: "Tire rotation and rebalance — 79.00 USD",
+        },
+        {
+          at: minsAgo(60 * 27),
+          actor: "Tom Whitfield, customer",
+          label: "Declined a repair",
+          detail: "Rear wiper blade is hardened — 34.00 USD",
         },
         {
           at: minsAgo(60 * 27),
           actor: "Stripe",
           label: "Payment received",
-          detail: "249.00 USD · ref cs_demo_outback_ro004",
+          detail: "297.00 USD · ref cs_demo_outback_ro004",
         },
         {
           at: minsAgo(60 * 26),

@@ -13,6 +13,7 @@ import {
   InProgressPanel,
   InspectionProgressPanel,
 } from "@/components/pitcrew/workflow-panels";
+import { ReportProvenance } from "@/components/pitcrew/report-provenance";
 import { ServiceRecordPanel } from "@/components/pitcrew/service-record";
 import { Button } from "@/components/ui/button";
 import { formatUsd } from "@/lib/format";
@@ -154,6 +155,8 @@ export function CustomerReport({ order }: { order: RepairOrder }) {
                 </p>
               </div>
             )}
+
+            <ReportProvenance order={order} />
 
             <h2 className="mt-8 text-xl font-semibold">
               Needs attention ({attention.length})
