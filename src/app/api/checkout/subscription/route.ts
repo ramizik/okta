@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   // No Stripe key configured: activate the plan directly so the demo path
   // still completes end to end.
   if (!stripeEnabled || !stripe) {
-    setShopPlan(plan.id);
+    await setShopPlan(plan.id);
     return NextResponse.json({
       url: `/shop?subscribed=${plan.id}&demo=1`,
       demo: true,

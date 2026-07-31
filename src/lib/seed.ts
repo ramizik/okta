@@ -1,5 +1,9 @@
 import type { PartOffer, Report, RepairOrder, Shop, User } from "./types";
 
+// Bump whenever seed data changes — a deployed store holding an older version
+// reseeds itself on next read, so prod never serves stale demo data.
+export const SEED_VERSION = 2;
+
 export const SEED_SHOP: Shop = {
   id: "shop_precision",
   name: "Precision Auto Care",

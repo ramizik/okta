@@ -28,7 +28,7 @@ export default async function Pricing() {
   return (
     <PricingPlans
       plans={PLANS}
-      currentPlan={isAdvisor ? getShop().plan : null}
+      currentPlan={isAdvisor ? (await getShop()).plan : null}
       signedIn={Boolean(session)}
       isAdvisor={isAdvisor}
       liveStripe={stripeEnabled}

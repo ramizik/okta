@@ -35,9 +35,9 @@ export default async function ShopDashboard({
   const session = await auth0.getSession();
   if (!session) redirect("/auth/login?returnTo=/shop");
 
-  const shop = getShop();
+  const shop = await getShop();
   const user = getSeedUser(session.user.email);
-  const orders = getOrders(shop.id);
+  const orders = await getOrders(shop.id);
 
   const rows: OrderRow[] = orders.map((o) => ({
     id: o.id,
@@ -68,7 +68,7 @@ export default async function ShopDashboard({
     <div className="min-h-screen">
       <AppTopBar
         role="advisor"
-        user={user?.name ?? session.user.name ?? "Advisor"}
+        user={user?.name ?? session.user.name ?? "Adviser"}
         shopName={shop.name}
       />
       <RoleSwitchHint email={session.user.email} />

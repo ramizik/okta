@@ -29,7 +29,8 @@ export default async function GarageOrder({
 
   const user = getSeedUser(session.user.email);
   const name = user?.name ?? session.user.name ?? "Customer";
-  const order = getOrder(id);
+  const order = await getOrder(id);
+  const shop = await getShop();
 
   // Ownership check: someone else's order is a not-found, never data.
   const owned =
@@ -40,7 +41,7 @@ export default async function GarageOrder({
   if (!owned) {
     return (
       <div className="min-h-screen">
-        <AppTopBar role="customer" user={name} shopName={getShop().name} />
+        <AppTopBar role="customer" user={name} shopName={shop.name} />
         <main className="mx-auto max-w-3xl px-6 py-16">
           <EmptyState
             icon={<Wrench className="h-5 w-5" />}

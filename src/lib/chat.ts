@@ -73,17 +73,19 @@ const PRODUCT_KNOWLEDGE = {
   })),
 };
 
-export function buildChatContext(
+export async function buildChatContext(
   role: Role,
   email: string,
   path: string,
-): object {
-  const shop = getShop();
+): Promise<object> {
+  const shop = await getShop();
   const orderIdMatch = path.match(/\/orders\/([\w-]+)/);
   const focusedId = orderIdMatch?.[1];
 
   const visibleOrders =
-    role === "advisor" ? getOrders(shop.id) : getOrdersForCustomer(email);
+    role === "advisor"
+      ? await getOrders(shop.id)
+      : await getOrdersForCustomer(email);
 
   // Ownership is enforced here: the focused order must be in the visible set.
   const focused = focusedId
@@ -152,7 +154,7 @@ export async function streamChatReply(
     process.env.OPENROUTER_API_API_KEY ?? process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OpenRouter key missing");
 
-  const context = buildChatContext(role, email, path);
+  const context = await buildChatContext(role, email, path);
 
   const upstream = await fetch(OPENROUTER_URL, {
     method: "POST",

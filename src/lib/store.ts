@@ -1,22 +1,44 @@
+import { Redis } from "@upstash/redis";
 import type { Finding, PartOffer, RepairOrder, Shop, User } from "./types";
-import { buildSeedOrders, SEED_SHOP, SEED_USERS } from "./seed";
+import { buildSeedOrders, SEED_SHOP, SEED_USERS, SEED_VERSION } from "./seed";
 
-// In-memory store for the demo. Backed by globalThis so it survives
-// Next.js HMR and module re-evaluation across route handlers.
+// Shared demo store. On Vercel each function instance used to hold its own
+// globalThis copy, so the advisor screen, the customer screen and the chatbot
+// could each see different data. State now lives in a single Redis JSON blob
+// (Upstash) that every instance reads and writes. When the Redis env vars are
+// absent (local dev before `vercel env pull`) it falls back to the old
+// globalThis store, which is consistent within one process.
 
 interface StoreState {
+  seedVersion: number;
   shop: Shop;
   users: User[];
   orders: RepairOrder[];
   seededAt: string;
 }
 
+const KEY = "pitcrew:state";
+
 const globalStore = globalThis as unknown as {
   __pitcrewStore?: StoreState;
+  __pitcrewRedis?: Redis | null;
 };
+
+function getRedis(): Redis | null {
+  if (globalStore.__pitcrewRedis !== undefined) {
+    return globalStore.__pitcrewRedis;
+  }
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+  globalStore.__pitcrewRedis = url && token ? new Redis({ url, token }) : null;
+  return globalStore.__pitcrewRedis;
+}
 
 function freshState(): StoreState {
   return {
+    seedVersion: SEED_VERSION,
     shop: structuredClone(SEED_SHOP),
     users: structuredClone(SEED_USERS),
     orders: buildSeedOrders(),
@@ -24,39 +46,60 @@ function freshState(): StoreState {
   };
 }
 
-function state(): StoreState {
-  if (!globalStore.__pitcrewStore) {
-    globalStore.__pitcrewStore = freshState();
+// A stored state from an older seed reseeds itself — bump SEED_VERSION in
+// seed.ts whenever demo data changes so prod never serves stale casts.
+async function loadState(): Promise<StoreState> {
+  const redis = getRedis();
+  if (!redis) {
+    const mem = globalStore.__pitcrewStore;
+    if (!mem || mem.seedVersion !== SEED_VERSION) {
+      globalStore.__pitcrewStore = freshState();
+    }
+    return globalStore.__pitcrewStore!;
   }
-  return globalStore.__pitcrewStore;
+  const stored = await redis.get<StoreState>(KEY);
+  if (stored && stored.seedVersion === SEED_VERSION) return stored;
+  const fresh = freshState();
+  await redis.set(KEY, fresh);
+  return fresh;
 }
 
-export function resetStore(): void {
-  globalStore.__pitcrewStore = freshState();
+async function saveState(state: StoreState): Promise<void> {
+  const redis = getRedis();
+  if (!redis) {
+    globalStore.__pitcrewStore = state;
+    return;
+  }
+  await redis.set(KEY, state);
 }
 
-export function getState(): StoreState {
-  return state();
+export async function resetStore(): Promise<void> {
+  await saveState(freshState());
 }
 
-export function getShop(): Shop {
-  return state().shop;
+export async function getState(): Promise<StoreState> {
+  return loadState();
 }
 
-export function setShopPlan(plan: Shop["plan"]): Shop {
-  const shop = state().shop;
-  shop.plan = plan;
-  return shop;
+export async function getShop(): Promise<Shop> {
+  return (await loadState()).shop;
 }
 
-export function getUsers(): User[] {
-  return state().users;
+export async function setShopPlan(plan: Shop["plan"]): Promise<Shop> {
+  const state = await loadState();
+  state.shop.plan = plan;
+  await saveState(state);
+  return state.shop;
 }
 
-export function getOrders(shopId: string): RepairOrder[] {
+export async function getUsers(): Promise<User[]> {
+  return (await loadState()).users;
+}
+
+export async function getOrders(shopId: string): Promise<RepairOrder[]> {
   // Hero order (ro_001) stays first; rest by most recently updated.
-  return state()
-    .orders.filter((o) => o.shopId === shopId)
+  return (await loadState()).orders
+    .filter((o) => o.shopId === shopId)
     .sort((a, b) => {
       if (a.id === "ro_001") return -1;
       if (b.id === "ro_001") return 1;
@@ -64,47 +107,54 @@ export function getOrders(shopId: string): RepairOrder[] {
     });
 }
 
-export function getOrdersForCustomer(email: string): RepairOrder[] {
+export async function getOrdersForCustomer(
+  email: string,
+): Promise<RepairOrder[]> {
   const needle = email.toLowerCase();
-  return state()
-    .orders.filter((o) => o.customerEmail.toLowerCase() === needle)
+  return (await loadState()).orders
+    .filter((o) => o.customerEmail.toLowerCase() === needle)
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
-export function getOrder(id: string): RepairOrder | undefined {
-  return state().orders.find((o) => o.id === id);
+export async function getOrder(id: string): Promise<RepairOrder | undefined> {
+  return (await loadState()).orders.find((o) => o.id === id);
 }
 
-export function updateOrder(
+export async function updateOrder(
   id: string,
   patch: Partial<Omit<RepairOrder, "id">>,
-): RepairOrder | undefined {
-  const order = getOrder(id);
+): Promise<RepairOrder | undefined> {
+  const state = await loadState();
+  const order = state.orders.find((o) => o.id === id);
   if (!order) return undefined;
   Object.assign(order, patch, { updatedAt: new Date().toISOString() });
+  await saveState(state);
   return order;
 }
 
-export function setItemApproval(
+export async function setItemApproval(
   orderId: string,
   itemId: string,
   approved: boolean | null,
-): RepairOrder | undefined {
-  const order = getOrder(orderId);
+): Promise<RepairOrder | undefined> {
+  const state = await loadState();
+  const order = state.orders.find((o) => o.id === orderId);
   const finding = order?.report?.findings.find((f) => f.id === itemId);
   if (!order || !finding) return undefined;
   finding.approved = approved;
   order.updatedAt = new Date().toISOString();
+  await saveState(state);
   return order;
 }
 
 /** Attach (or clear) the advisor-sourced part for one finding. */
-export function setFindingPart(
+export async function setFindingPart(
   orderId: string,
   findingId: string,
   part: PartOffer | null,
-): RepairOrder | undefined {
-  const order = getOrder(orderId);
+): Promise<RepairOrder | undefined> {
+  const state = await loadState();
+  const order = state.orders.find((o) => o.id === orderId);
   const finding = order?.report?.findings.find((f) => f.id === findingId);
   if (!order || !finding) return undefined;
   if (part) {
@@ -113,6 +163,7 @@ export function setFindingPart(
     delete finding.selectedPart;
   }
   order.updatedAt = new Date().toISOString();
+  await saveState(state);
   return order;
 }
 

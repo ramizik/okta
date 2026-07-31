@@ -118,7 +118,7 @@ export const SHOP_STEP_DETAILS: Record<OrderStatus, StepDetail> = {
   CHECKED_IN: {
     headline: "Vehicle received and logged by the advisor.",
     rows: [
-      { label: "Checked in", value: "Today, 8:12 AM · Advisor Sarah M." },
+      { label: "Checked in", value: "Today, 8:12 AM · Adviser Sarah M." },
       {
         label: "Arrival condition",
         value: "Drivable. CEL on, rough idle reported by customer.",
@@ -354,7 +354,7 @@ export const inspectionSteps: {
   },
   {
     id: "i6",
-    label: "Advisor review & pricing",
+    label: "Adviser review & pricing",
     tech: "Sarah Mitchell",
     state: "pending",
     detail: "Findings priced and written up for your report.",

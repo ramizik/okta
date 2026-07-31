@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   try {
     const checkout = await stripe.checkout.sessions.retrieve(sessionId);
     const orderId = String(checkout.metadata?.orderId ?? "");
-    const order = getOrder(orderId);
+    const order = await getOrder(orderId);
 
     // The session_id alone must not be able to flip an order: the caller has
     // to be signed in as the customer who owns it.
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     if (checkout.payment_status !== "paid") return fail(order.id);
 
-    if (!isPaid(order)) updateOrder(order.id, { status: "PAID" });
+    if (!isPaid(order)) await updateOrder(order.id, { status: "PAID" });
 
     return NextResponse.redirect(
       new URL(`/garage/orders/${order.id}?paid=1`, request.url),

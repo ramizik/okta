@@ -4,9 +4,9 @@ import { resetStore, getState } from "@/lib/store";
 // Demo safety net: returns the app to a clean seeded state.
 // GET is supported so it can be hit from a browser address bar mid-demo.
 
-function reset() {
-  resetStore();
-  const { orders, seededAt } = getState();
+async function reset() {
+  await resetStore();
+  const { orders, seededAt } = await getState();
   return NextResponse.json({
     ok: true,
     seededAt,

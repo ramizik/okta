@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
 
   const visible =
     role === "advisor"
-      ? getOrders(getShop().id)
-      : getOrdersForCustomer(session.user.email);
+      ? await getOrders((await getShop()).id)
+      : await getOrdersForCustomer(session.user.email);
   const order = orderId ? visible.find((o) => o.id === orderId) : undefined;
 
   if (order) {

@@ -25,9 +25,9 @@ export default async function Garage() {
   const session = await auth0.getSession();
   if (!session) redirect("/auth/login?returnTo=/garage");
 
-  const shop = getShop();
+  const shop = await getShop();
   const user = getSeedUser(session.user.email);
-  const orders = getOrdersForCustomer(session.user.email ?? "");
+  const orders = await getOrdersForCustomer(session.user.email ?? "");
   const name = user?.name ?? session.user.name ?? "Customer";
   const firstName = name.split(" ")[0];
 

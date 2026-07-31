@@ -29,7 +29,7 @@ async function requireAdvisor() {
 
 async function requireOwner(orderId: string): Promise<RepairOrder> {
   const session = await auth0.getSession();
-  const order = getOrder(orderId);
+  const order = await getOrder(orderId);
   if (!session || !order) throw new Error("Not authorized");
   const email = (session.user.email ?? "").toLowerCase();
   if (order.customerEmail.toLowerCase() !== email) {
@@ -41,14 +41,14 @@ async function requireOwner(orderId: string): Promise<RepairOrder> {
 /** The wow moment: raw tech notes → plain-English report. Never throws on stage. */
 export async function generateOrderReportAction(orderId: string) {
   await requireAdvisor();
-  const order = getOrder(orderId);
+  const order = await getOrder(orderId);
   if (!order) return { ok: false as const, source: "fallback" as const };
 
   const { report, source } = await generateReport(
     order.rawTechNotes,
     order.vehicle,
   );
-  updateOrder(orderId, { report });
+  await updateOrder(orderId, { report });
 
   revalidatePath(`/shop/orders/${orderId}`);
   revalidatePath("/shop");
@@ -57,16 +57,16 @@ export async function generateOrderReportAction(orderId: string) {
 
 export async function saveNotesAction(orderId: string, rawTechNotes: string) {
   await requireAdvisor();
-  updateOrder(orderId, { rawTechNotes });
+  await updateOrder(orderId, { rawTechNotes });
   revalidatePath(`/shop/orders/${orderId}`);
   return { ok: true as const };
 }
 
 export async function sendToCustomerAction(orderId: string) {
   await requireAdvisor();
-  const order = getOrder(orderId);
+  const order = await getOrder(orderId);
   if (!order?.report) return { ok: false as const };
-  updateOrder(orderId, { status: "AWAITING_APPROVAL" });
+  await updateOrder(orderId, { status: "AWAITING_APPROVAL" });
   revalidatePath(`/shop/orders/${orderId}`);
   revalidatePath("/shop");
   revalidatePath("/garage");
@@ -78,7 +78,7 @@ export async function advanceStatusAction(
   status: RepairOrder["status"],
 ) {
   await requireAdvisor();
-  updateOrder(orderId, { status });
+  await updateOrder(orderId, { status });
   revalidatePath(`/shop/orders/${orderId}`);
   revalidatePath("/shop");
   return { ok: true as const };
@@ -90,22 +90,25 @@ export async function setApprovalAction(
   findingId: string,
   approved: boolean | null,
 ) {
-  const order = await requireOwner(orderId);
-  setItemApproval(orderId, findingId, approved);
+  await requireOwner(orderId);
+  // Use the returned order, not the pre-mutation snapshot — with the shared
+  // store the snapshot no longer aliases the stored object.
+  const updated = await setItemApproval(orderId, findingId, approved);
+  if (!updated) throw new Error("Unknown order or finding");
 
   // Any approval activity moves a sent report into the approved lane.
-  if (order.status === "AWAITING_APPROVAL") {
-    const anyApproved = (order.report?.findings ?? []).some(
+  if (updated.status === "AWAITING_APPROVAL") {
+    const anyApproved = (updated.report?.findings ?? []).some(
       (f) => f.approved === true,
     );
-    if (anyApproved) updateOrder(orderId, { status: "APPROVED" });
+    if (anyApproved) await updateOrder(orderId, { status: "APPROVED" });
   }
 
   revalidatePath(`/garage/orders/${orderId}`);
   revalidatePath("/garage");
   revalidatePath(`/shop/orders/${orderId}`);
   revalidatePath("/shop");
-  return { ok: true as const, totalCents: approvedTotalCents(order) };
+  return { ok: true as const, totalCents: approvedTotalCents(updated) };
 }
 
 /**
@@ -115,7 +118,7 @@ export async function setApprovalAction(
  */
 export async function searchPartsAction(orderId: string, findingId: string) {
   await requireAdvisor();
-  const order = getOrder(orderId);
+  const order = await getOrder(orderId);
   const finding = order?.report?.findings.find((f) => f.id === findingId);
   if (!order || !finding) {
     return { ok: false as const, query: "", offers: [], source: "fallback" as const };
@@ -124,7 +127,7 @@ export async function searchPartsAction(orderId: string, findingId: string) {
   const result = await searchPartsForFinding(
     finding,
     order.vehicle,
-    getShop().location,
+    (await getShop()).location,
   );
   return { ok: true as const, ...result };
 }
@@ -136,7 +139,7 @@ export async function selectPartAction(
   part: PartOffer | null,
 ) {
   await requireAdvisor();
-  setFindingPart(orderId, findingId, part);
+  await setFindingPart(orderId, findingId, part);
   revalidatePath(`/shop/orders/${orderId}`);
   return { ok: true as const };
 }

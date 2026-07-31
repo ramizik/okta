@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       checkout.status === "complete" || checkout.payment_status === "paid";
 
     if (plan && complete) {
-      setShopPlan(plan.id);
+      await setShopPlan(plan.id);
       shopUrl.searchParams.set("subscribed", plan.id);
     } else {
       shopUrl.searchParams.set("subscribed", "pending");

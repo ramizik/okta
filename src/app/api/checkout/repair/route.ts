@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json().catch(() => ({}))) as { orderId?: string };
-  const order = getOrder(body.orderId ?? "");
+  const order = await getOrder(body.orderId ?? "");
   const email = (session.user.email ?? "").toLowerCase();
 
   // Ownership check: someone else's order is a not-found, never a charge.
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
   // No Stripe key configured: mark it paid so the demo path still completes.
   if (!stripeEnabled || !stripe) {
-    updateOrder(order.id, { status: "PAID" });
+    await updateOrder(order.id, { status: "PAID" });
     return NextResponse.json({
       url: `/garage/orders/${order.id}?paid=1&demo=1`,
       demo: true,

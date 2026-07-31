@@ -27,10 +27,10 @@ export default async function ShopOrderDetail({
   const session = await auth0.getSession();
   if (!session) redirect(`/auth/login?returnTo=/shop/orders/${id}`);
 
-  const shop = getShop();
+  const shop = await getShop();
   const user = getSeedUser(session.user.email);
-  const order = getOrder(id);
-  const advisorName = user?.name ?? session.user.name ?? "Advisor";
+  const order = await getOrder(id);
+  const advisorName = user?.name ?? session.user.name ?? "Adviser";
 
   if (!order || order.shopId !== shop.id) {
     return (
