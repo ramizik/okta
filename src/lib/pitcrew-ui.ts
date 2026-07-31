@@ -217,6 +217,57 @@ export const techReports: TechReport[] = [
   },
 ];
 
+const SEVERITY_TAGS: Record<string, Severity> = {
+  RED: "red",
+  YELLOW: "amber",
+  AMBER: "amber",
+  GREEN: "green",
+};
+
+// Who gets credited with each section, cycled by position so a given order
+// always shows the same names.
+const TECH_ROSTER = [
+  { tech: "Luis Ferrer", role: "ASE Master Tech" },
+  { tech: "Dee Alvarez", role: "Brake & chassis Tech" },
+  { tech: "Kev Nowak", role: "Electrical Tech" },
+];
+
+/**
+ * Pull the shop-floor sections out of an order's raw technician notes.
+ *
+ * Inspection sheets are written as `[RED] Area` followed by an optional
+ * `Technician Note:` line. Parsing the order's own notes keeps the adviser's
+ * workflow panel showing that car's findings instead of a fixed sample — the
+ * panel used to print the hero Accord's misfire on every order.
+ */
+export function parseTechNotes(raw: string): TechReport[] {
+  const out: TechReport[] = [];
+  for (const line of (raw ?? "").split("\n")) {
+    const header = line.match(/^\[(\w+)\]\s*(.+?)\s*$/);
+    if (header) {
+      const severity = SEVERITY_TAGS[header[1].toUpperCase()];
+      if (!severity) continue;
+      const seat = TECH_ROSTER[out.length % TECH_ROSTER.length];
+      out.push({
+        id: `tn_${out.length}`,
+        area: header[2],
+        severity,
+        notes: "",
+        time: "",
+        ...seat,
+      });
+      continue;
+    }
+    const note = line.match(/^Technician Note:\s*(.+)$/i);
+    if (note && out.length > 0) {
+      const last = out[out.length - 1];
+      last.notes = last.notes ? `${last.notes} ${note[1]}` : note[1];
+    }
+  }
+  // Sections that carry an actual note first — those are what the adviser reads.
+  return out.filter((t) => t.notes).concat(out.filter((t) => !t.notes));
+}
+
 export const aiSummary =
   "Three techs cleared the vehicle in 34 minutes. Safety systems (brakes, tires, charging) all pass. Two revenue items are urgent — cylinder 2 misfire and overdue oil — plus one comfort item (cabin filter). Customer-facing report was drafted automatically and sent for approval.";
 

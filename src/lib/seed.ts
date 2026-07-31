@@ -546,8 +546,18 @@ Technician Note: Rear blade torn, streaking. Fronts ok.
         photoUrl: "",
       },
       status: "IN_PROGRESS",
-      rawTechNotes:
-        "Water pump weeping at gasket. Coolant low. Serpentine belt glazed. Replace pump, belt, flush coolant.",
+      rawTechNotes: `DIAGNOSTIC — 91,204 MI · TOWED IN
+
+[RED] Cooling system
+Technician Note: Water pump weeping at gasket, crust trail down block. Coolant 2qt low, cap ok, no other leak found. Replace pump, flush and refill.
+
+[YELLOW] Drive belt
+Technician Note: Serpentine belt glazed and shiny, no cracks yet. Belt comes off for pump job — replace while in there.
+
+[GREEN] Brakes — pads F 6mm R 7mm, rotors ok
+[GREEN] Battery / charging — 12.5V rest, alt 14.2V under load
+[GREEN] Tires — 7/32 even, no damage
+[GREEN] Oil — level and condition ok, within interval`,
       report: {
         verdict: "STOP_DRIVING",
         summary:

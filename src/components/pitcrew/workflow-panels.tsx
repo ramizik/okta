@@ -15,6 +15,7 @@ import {
   aiSummary,
   checkInPhotos,
   inspectionSteps,
+  parseTechNotes,
   partsPurchased,
   repairTasks,
   techReports,
@@ -27,6 +28,9 @@ export function TechWorkflowPanel({ order }: { order: RepairOrder }) {
   const findings = order.report?.findings ?? [];
   const approved = findings.filter((f) => f.approved === true).length;
   const priced = findings.filter((f) => f.priceCents > 0).length;
+  // Fall back to the sample sheet only if this order's notes aren't structured.
+  const parsedNotes = parseTechNotes(order.rawTechNotes);
+  const sections = parsedNotes.length > 0 ? parsedNotes : techReports;
 
   return (
     <div>
@@ -45,7 +49,7 @@ export function TechWorkflowPanel({ order }: { order: RepairOrder }) {
 
       <p className="label-caps mt-5">Technician workflow</p>
       <div className="mt-2 space-y-2">
-        {techReports.map((t) => (
+        {sections.map((t) => (
           <div key={t.id} className="rounded-lg border border-border bg-card p-3">
             <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
               <SeverityDot severity={t.severity} />
