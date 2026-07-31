@@ -13,6 +13,7 @@ import {
   StatusStepper,
   VerdictBadge,
 } from "@/components/pitcrew/status";
+import { ServiceRecordButton } from "@/components/pitcrew/service-record";
 import { TechWorkflowPanel } from "@/components/pitcrew/workflow-panels";
 import { Button } from "@/components/ui/button";
 import { formatUsd } from "@/lib/format";
@@ -99,28 +100,32 @@ export function OrderWorkbench({ order }: { order: RepairOrder }) {
             · {order.customerName} · {order.customerPhone}
           </p>
         </div>
-        <span
-          className="shrink-0"
-          title={
-            hasReport
-              ? order.status === "INSPECTION_COMPLETE"
-                ? "Send this report for approval"
-                : "Already sent to the customer"
-              : "Generate a report first"
-          }
-        >
-          <Button disabled={!canSend || sending} onClick={send}>
-            {sending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Sending…
-              </>
-            ) : (
-              <>
-                Send to customer <ArrowRight className="h-4 w-4" />
-              </>
-            )}
-          </Button>
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          {/* Advisors can pull the customer's record at any point — it's how
+              they answer "what did we actually do to my car?" on the phone. */}
+          <ServiceRecordButton order={order} />
+          <span
+            title={
+              hasReport
+                ? order.status === "INSPECTION_COMPLETE"
+                  ? "Send this report for approval"
+                  : "Already sent to the customer"
+                : "Generate a report first"
+            }
+          >
+            <Button disabled={!canSend || sending} onClick={send}>
+              {sending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Sending…
+                </>
+              ) : (
+                <>
+                  Send to customer <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </span>
+        </div>
       </div>
 
       <div className="mt-6 rounded-xl border border-border bg-card p-6 shadow-card">

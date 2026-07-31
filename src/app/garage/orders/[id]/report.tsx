@@ -13,6 +13,7 @@ import {
   InProgressPanel,
   InspectionProgressPanel,
 } from "@/components/pitcrew/workflow-panels";
+import { ServiceRecordPanel } from "@/components/pitcrew/service-record";
 import { Button } from "@/components/ui/button";
 import { formatUsd } from "@/lib/format";
 import { bySeverity, isPaid, vehicleName } from "@/lib/pitcrew-ui";
@@ -31,6 +32,9 @@ export function CustomerReport({ order }: { order: RepairOrder }) {
   const approved = findings.filter((f) => f.approved === true);
   const totalCents = approved.reduce((s, f) => s + f.priceCents, 0);
   const paid = isPaid(order);
+  // The take-away record only exists once money has moved. On a finished job it
+  // leads the page; while work is still running it sits below the findings.
+  const record = paid ? <ServiceRecordPanel order={order} /> : null;
 
   // Toast the outcome of a return trip from Stripe Checkout, once.
   const searchParams = useSearchParams();
@@ -119,6 +123,8 @@ export function CustomerReport({ order }: { order: RepairOrder }) {
           />
         </div>
 
+        {order.status === "READY" && record}
+
         {findings.length === 0 ? (
           <div className="mt-6">
             <EmptyState
@@ -195,6 +201,8 @@ export function CustomerReport({ order }: { order: RepairOrder }) {
             )}
           </>
         )}
+
+        {order.status !== "READY" && record}
       </main>
 
       {!paid && approved.length > 0 && (
