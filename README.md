@@ -50,8 +50,10 @@ jump straight to any screen without clicking through the whole flow:
 3. Hit **Generate PitCrew Report** → AI rewrites it in plain English, priced from the shop's service menu
 4. Click **Find parts** on any line item → AI writes a parts query, real vendors and prices come back
 5. **Send to customer**
-6. **Sign in as the customer** → approve/decline each item, watch the total update
+6. **Sign in as `customer@pitcrew.demo`** → approve/decline each item, watch the total update
 7. **Pay** → Stripe Checkout → order flips to paid on *both* screens
+
+> Short on time? Sign in as `dana@pitcrew.demo` — that account is already at step 6.
 
 ---
 
