@@ -2,7 +2,7 @@ import type { PartOffer, Report, RepairOrder, Shop, User } from "./types";
 
 // Bump whenever seed data changes — a deployed store holding an older version
 // reseeds itself on next read, so prod never serves stale demo data.
-export const SEED_VERSION = 2;
+export const SEED_VERSION = 4;
 
 export const SEED_SHOP: Shop = {
   id: "shop_precision",
@@ -21,10 +21,26 @@ export const SEED_USERS: User[] = [
     role: "advisor",
     shopId: SEED_SHOP.id,
   },
+  // Three customer logins, one per repair stage, so each state can be shown
+  // on its own account instead of being reached by clicking through the flow.
   {
     id: "user_marcus",
     name: "Marcus Chen",
     email: "customer@pitcrew.demo",
+    role: "customer",
+    shopId: SEED_SHOP.id,
+  },
+  {
+    id: "user_dana",
+    name: "Dana Ortiz",
+    email: "dana@pitcrew.demo",
+    role: "customer",
+    shopId: SEED_SHOP.id,
+  },
+  {
+    id: "user_tom",
+    name: "Tom Whitfield",
+    email: "tom@pitcrew.demo",
     role: "customer",
     shopId: SEED_SHOP.id,
   },
@@ -325,6 +341,20 @@ export function buildSeedOrders(): RepairOrder[] {
       status: "INSPECTION_COMPLETE",
       rawTechNotes: HERO_RAW_NOTES,
       report: null,
+      events: [
+        {
+          at: minsAgo(94),
+          actor: "Sarah Martinez, service adviser",
+          label: "Vehicle checked in",
+          detail: "64,182 mi · check engine light on, rough idle at stops",
+        },
+        {
+          at: minsAgo(34),
+          actor: "Luis Ferrer, ASE master technician",
+          label: "Inspection completed",
+          detail: "27-point inspection · P0302 stored, cylinder 2 misfire confirmed",
+        },
+      ],
       createdAt: minsAgo(94),
       updatedAt: minsAgo(2),
     },
@@ -332,12 +362,12 @@ export function buildSeedOrders(): RepairOrder[] {
       id: "ro_002",
       shopId: SEED_SHOP.id,
       shopName: SEED_SHOP.name,
-      // Marcus's second car. Seeded at AWAITING_APPROVAL so the demo can show
-      // the approve-and-pay screen without first running the live generation —
-      // and so there's a fallback if the AI step is slow on stage.
-      customerName: "Marcus Chen",
-      customerEmail: "customer@pitcrew.demo",
-      customerPhone: "(209) 555-0142",
+      // Dana's account opens straight onto the approve-and-pay screen, so that
+      // step can be shown without first running the live generation — and it's
+      // the fallback if the AI step is slow on stage.
+      customerName: "Dana Ortiz",
+      customerEmail: "dana@pitcrew.demo",
+      customerPhone: "(209) 555-0177",
       vehicle: {
         id: "veh_rav4",
         year: 2021,
@@ -383,6 +413,32 @@ export function buildSeedOrders(): RepairOrder[] {
           },
         ],
       },
+      events: [
+        {
+          at: minsAgo(230),
+          actor: "Sarah Martinez, service adviser",
+          label: "Vehicle checked in",
+          detail: "38,450 mi · customer reported a faint squeal when braking",
+        },
+        {
+          at: minsAgo(160),
+          actor: "Dee Alvarez, brake & chassis technician",
+          label: "Inspection completed",
+          detail: "Front pads measured at 3mm, rotors lipped · tires 5/32 all round",
+        },
+        {
+          at: minsAgo(140),
+          actor: "PitCrew AI",
+          label: "Inspection report written",
+          detail: "2 findings from the technician's notes · verdict service soon",
+        },
+        {
+          at: minsAgo(18),
+          actor: "Sarah Martinez, service adviser",
+          label: "Report sent to customer",
+          detail: "Sent to dana@pitcrew.demo for per-item approval",
+        },
+      ],
       createdAt: minsAgo(230),
       updatedAt: minsAgo(18),
     },
@@ -463,6 +519,74 @@ export function buildSeedOrders(): RepairOrder[] {
           },
         ],
       },
+      payment: {
+        at: minsAgo(60 * 4),
+        amountCents: 78300,
+        processor: "Stripe",
+        reference: "cs_demo_f150_ro003",
+      },
+      events: [
+        {
+          at: minsAgo(60 * 26),
+          actor: "Sarah Martinez, service adviser",
+          label: "Vehicle checked in",
+          detail: "91,204 mi · towed in, coolant smell and temperature gauge climbing",
+        },
+        {
+          at: minsAgo(60 * 25),
+          actor: "Luis Ferrer, ASE master technician",
+          label: "Inspection completed",
+          detail: "Water pump weeping at the gasket, coolant low, belt glazed",
+        },
+        {
+          at: minsAgo(60 * 24),
+          actor: "PitCrew AI",
+          label: "Inspection report written",
+          detail: "2 findings from the technician's notes · verdict stop driving",
+        },
+        {
+          at: minsAgo(60 * 24),
+          actor: "Sarah Martinez, service adviser",
+          label: "Report sent to customer",
+          detail: "Sent to priya.nair@example.com for per-item approval",
+        },
+        {
+          at: minsAgo(60 * 5),
+          actor: "Priya Nair, customer",
+          label: "Approved a repair",
+          detail: "Water pump is leaking coolant — 685.00 USD",
+        },
+        {
+          at: minsAgo(60 * 5),
+          actor: "Priya Nair, customer",
+          label: "Approved a repair",
+          detail: "Serpentine belt is glazed — 98.00 USD",
+        },
+        {
+          at: minsAgo(60 * 4),
+          actor: "Stripe",
+          label: "Payment received",
+          detail: "783.00 USD · ref cs_demo_f150_ro003",
+        },
+        {
+          at: minsAgo(285),
+          actor: "Sarah Martinez, service adviser",
+          label: "Part sourced",
+          detail: "Motorcraft Water Pump PW-544 — NAPA Auto Parts, 187.42 USD",
+        },
+        {
+          at: minsAgo(283),
+          actor: "Sarah Martinez, service adviser",
+          label: "Part sourced",
+          detail: "Gates Serpentine Belt K060923 — RockAuto, 26.88 USD",
+        },
+        {
+          at: minsAgo(140),
+          actor: "Luis Ferrer, ASE master technician",
+          label: "Repair work started",
+          detail: "Bay 3 · pump and belt on the lift",
+        },
+      ],
       createdAt: minsAgo(60 * 26),
       updatedAt: minsAgo(140),
     },
@@ -470,11 +594,10 @@ export function buildSeedOrders(): RepairOrder[] {
       id: "ro_004",
       shopId: SEED_SHOP.id,
       shopName: SEED_SHOP.name,
-      // Marcus's third car — the finished state, so the garage shows the full
-      // arc (being inspected / needs a decision / done) on one login.
-      customerName: "Marcus Chen",
-      customerEmail: "customer@pitcrew.demo",
-      customerPhone: "(209) 555-0142",
+      // Tom's account shows the finished state — job complete, car ready.
+      customerName: "Tom Whitfield",
+      customerEmail: "tom@pitcrew.demo",
+      customerPhone: "(209) 555-0128",
       vehicle: {
         id: "veh_outback",
         year: 2020,
@@ -507,6 +630,68 @@ export function buildSeedOrders(): RepairOrder[] {
           },
         ],
       },
+      payment: {
+        at: minsAgo(60 * 27),
+        amountCents: 24900,
+        processor: "Stripe",
+        reference: "cs_demo_outback_ro004",
+      },
+      events: [
+        {
+          at: minsAgo(60 * 30),
+          actor: "Sarah Martinez, service adviser",
+          label: "Vehicle checked in",
+          detail: "51,377 mi · booked in for the 60,000-mile service",
+        },
+        {
+          at: minsAgo(60 * 29),
+          actor: "Dee Alvarez, brake & chassis technician",
+          label: "Inspection completed",
+          detail: "27-point inspection · no faults found, brakes and tires within spec",
+        },
+        {
+          at: minsAgo(60 * 28),
+          actor: "PitCrew AI",
+          label: "Inspection report written",
+          detail: "1 finding from the technician's notes · verdict safe to drive",
+        },
+        {
+          at: minsAgo(60 * 28),
+          actor: "Sarah Martinez, service adviser",
+          label: "Report sent to customer",
+          detail: "Sent to tom@pitcrew.demo for per-item approval",
+        },
+        {
+          at: minsAgo(60 * 27),
+          actor: "Tom Whitfield, customer",
+          label: "Approved a repair",
+          detail: "60,000-mile service completed — 249.00 USD",
+        },
+        {
+          at: minsAgo(60 * 27),
+          actor: "Stripe",
+          label: "Payment received",
+          detail: "249.00 USD · ref cs_demo_outback_ro004",
+        },
+        {
+          at: minsAgo(60 * 26),
+          actor: "Luis Ferrer, ASE master technician",
+          label: "Repair work started",
+          detail: "Bay 1 · oil, filters, tire rotation, brake inspection",
+        },
+        {
+          at: minsAgo(60 * 2),
+          actor: "Luis Ferrer, ASE master technician",
+          label: "Work completed",
+          detail: "5W-30 full synthetic, oil and cabin filters, tires rotated front-to-rear",
+        },
+        {
+          at: minsAgo(45),
+          actor: "Sarah Martinez, service adviser",
+          label: "Quality check passed, vehicle ready for pickup",
+          detail: "Road test completed, no stored codes",
+        },
+      ],
       createdAt: minsAgo(60 * 30),
       updatedAt: minsAgo(45),
     },

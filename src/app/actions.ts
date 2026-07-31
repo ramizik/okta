@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { auth0 } from "@/lib/auth0";
-import { resolveRole } from "@/lib/roles";
+import { getSeedUser, resolveRole } from "@/lib/roles";
 import {
+  appendEvent,
   approvedTotalCents,
   getOrder,
   getShop,
@@ -11,6 +12,7 @@ import {
   setItemApproval,
   updateOrder,
 } from "@/lib/store";
+import { CUSTOMER_LABELS } from "@/lib/pitcrew-ui";
 import { generateReport } from "@/lib/ai";
 import { searchPartsForFinding } from "@/lib/parts";
 import type { PartOffer, RepairOrder } from "@/lib/types";
@@ -27,6 +29,13 @@ async function requireAdvisor() {
   return session;
 }
 
+/** Who to credit in the order history for an advisor-side action. */
+function advisorName(session: { user: { email?: string; name?: string } }) {
+  const named =
+    getSeedUser(session.user.email)?.name ?? session.user.name ?? "Adviser";
+  return `${named}, service adviser`;
+}
+
 async function requireOwner(orderId: string): Promise<RepairOrder> {
   const session = await auth0.getSession();
   const order = await getOrder(orderId);
@@ -40,7 +49,7 @@ async function requireOwner(orderId: string): Promise<RepairOrder> {
 
 /** The wow moment: raw tech notes → plain-English report. Never throws on stage. */
 export async function generateOrderReportAction(orderId: string) {
-  await requireAdvisor();
+  const session = await requireAdvisor();
   const order = await getOrder(orderId);
   if (!order) return { ok: false as const, source: "fallback" as const };
 
@@ -49,6 +58,11 @@ export async function generateOrderReportAction(orderId: string) {
     order.vehicle,
   );
   await updateOrder(orderId, { report });
+  await appendEvent(orderId, {
+    actor: source === "live" ? "PitCrew AI" : "PitCrew (offline template)",
+    label: "Inspection report written",
+    detail: `${report.findings.length} findings from the technician's notes · verdict ${report.verdict.replace(/_/g, " ").toLowerCase()} · reviewed by ${advisorName(session)}`,
+  });
 
   revalidatePath(`/shop/orders/${orderId}`);
   revalidatePath("/shop");
@@ -63,10 +77,15 @@ export async function saveNotesAction(orderId: string, rawTechNotes: string) {
 }
 
 export async function sendToCustomerAction(orderId: string) {
-  await requireAdvisor();
+  const session = await requireAdvisor();
   const order = await getOrder(orderId);
   if (!order?.report) return { ok: false as const };
   await updateOrder(orderId, { status: "AWAITING_APPROVAL" });
+  await appendEvent(orderId, {
+    actor: advisorName(session),
+    label: "Report sent to customer",
+    detail: `Sent to ${order.customerEmail} for per-item approval`,
+  });
   revalidatePath(`/shop/orders/${orderId}`);
   revalidatePath("/shop");
   revalidatePath("/garage");
@@ -77,9 +96,15 @@ export async function advanceStatusAction(
   orderId: string,
   status: RepairOrder["status"],
 ) {
-  await requireAdvisor();
+  const session = await requireAdvisor();
   await updateOrder(orderId, { status });
+  await appendEvent(orderId, {
+    actor: advisorName(session),
+    label: `Status moved to ${CUSTOMER_LABELS[status]}`,
+  });
   revalidatePath(`/shop/orders/${orderId}`);
+  revalidatePath("/garage");
+  revalidatePath(`/garage/orders/${orderId}`);
   revalidatePath("/shop");
   return { ok: true as const };
 }
@@ -101,7 +126,14 @@ export async function setApprovalAction(
     const anyApproved = (updated.report?.findings ?? []).some(
       (f) => f.approved === true,
     );
-    if (anyApproved) await updateOrder(orderId, { status: "APPROVED" });
+    if (anyApproved) {
+      await updateOrder(orderId, { status: "APPROVED" });
+      await appendEvent(orderId, {
+        actor: `${updated.customerName}, customer`,
+        label: "Work authorised",
+        detail: "Approved items released to the shop for scheduling",
+      });
+    }
   }
 
   revalidatePath(`/garage/orders/${orderId}`);

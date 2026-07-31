@@ -64,6 +64,26 @@ export interface Vehicle {
   photoUrl: string;
 }
 
+/**
+ * One thing that actually happened on this order. Appended by the mutators
+ * that cause it — never written by hand at render time. This is what the
+ * printed service record's history section is built from.
+ */
+export interface OrderEvent {
+  at: string; // ISO
+  actor: string; // "Sarah Martinez, service adviser"
+  label: string; // "Report sent to customer"
+  detail?: string;
+}
+
+/** Recorded when money actually moves, so the record can cite the reference. */
+export interface PaymentRecord {
+  at: string; // ISO
+  amountCents: number;
+  processor: "Stripe" | "Demo";
+  reference: string; // Stripe Checkout Session id
+}
+
 export interface RepairOrder {
   id: string;
   shopId: string;
@@ -75,6 +95,10 @@ export interface RepairOrder {
   status: OrderStatus;
   rawTechNotes: string;
   report: Report | null;
+  // Optional: seeded orders start with no history, and a state blob written by
+  // an older seed version won't carry the field. Mutators use `?? []`.
+  events?: OrderEvent[];
+  payment?: PaymentRecord;
   createdAt: string; // ISO
   updatedAt: string; // ISO
 }

@@ -3,7 +3,6 @@ import { formatUsd } from "./format";
 import { PLANS } from "./plans";
 import {
   approvedTotalCents,
-  getOrder,
   getOrders,
   getOrdersForCustomer,
   getShop,

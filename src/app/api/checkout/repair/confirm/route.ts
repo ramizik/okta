@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth0 } from "@/lib/auth0";
 import { stripe, stripeEnabled } from "@/lib/stripe";
-import { getOrder, updateOrder } from "@/lib/store";
+import { getOrder, recordPayment, updateOrder } from "@/lib/store";
 import { isPaid } from "@/lib/pitcrew-ui";
 
 // Success redirect from repair Checkout. The session is verified server-side
@@ -35,6 +35,14 @@ export async function GET(request: NextRequest) {
     if (checkout.payment_status !== "paid") return fail(order.id);
 
     if (!isPaid(order)) await updateOrder(order.id, { status: "PAID" });
+    // recordPayment is a no-op once a payment exists, so a refresh of this
+    // URL can't double-log the receipt line on the service record.
+    await recordPayment(order.id, {
+      at: new Date().toISOString(),
+      amountCents: checkout.amount_total ?? 0,
+      processor: "Stripe",
+      reference: checkout.id,
+    });
 
     return NextResponse.redirect(
       new URL(`/garage/orders/${order.id}?paid=1`, request.url),

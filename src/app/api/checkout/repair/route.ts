@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth0 } from "@/lib/auth0";
 import { stripe, stripeEnabled } from "@/lib/stripe";
-import { approvedTotalCents, getOrder, updateOrder } from "@/lib/store";
+import {
+  approvedTotalCents,
+  getOrder,
+  recordPayment,
+  updateOrder,
+} from "@/lib/store";
 import { isPaid } from "@/lib/pitcrew-ui";
 
 // Repair payment checkout. The customer pays for the items they approved —
@@ -43,6 +48,12 @@ export async function POST(request: NextRequest) {
   // No Stripe key configured: mark it paid so the demo path still completes.
   if (!stripeEnabled || !stripe) {
     await updateOrder(order.id, { status: "PAID" });
+    await recordPayment(order.id, {
+      at: new Date().toISOString(),
+      amountCents: totalCents,
+      processor: "Demo",
+      reference: `demo_${order.id}`,
+    });
     return NextResponse.json({
       url: `/garage/orders/${order.id}?paid=1&demo=1`,
       demo: true,

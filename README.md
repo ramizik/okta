@@ -15,18 +15,31 @@ actually understands — then lets them approve and pay for the work in a tap.
 
 ## 🔑 Test it yourself
 
-Two roles, two completely different experiences. Same password for both.
+Four accounts, all with the password **`PitCrew-Demo-2026!`**
 
-| Role | Email | Password |
-|---|---|---|
-| **Repair Adviser** (shop side) | `advisor@pitcrew.demo` | `PitCrew-Demo-2026!` |
-| **Customer** (car owner) | `customer@pitcrew.demo` | `PitCrew-Demo-2026!` |
+**🔧 The shop side**
 
-> 💡 Open the two accounts in separate browser profiles to watch state sync live between
-> the shop and the customer. Stripe runs in test mode — pay with `4242 4242 4242 4242`,
-> any future expiry, any CVC.
+| Email | Sees |
+|---|---|
+| `advisor@pitcrew.demo` | Every repair order in the shop, the AI report generator, and live parts sourcing |
+
+**🚗 The customer side** — each account is pre-seeded at a different repair stage, so you can
+jump straight to any screen without clicking through the whole flow:
+
+| Email | Car | Stage | What you'll see |
+|---|---|---|---|
+| `customer@pitcrew.demo` | 2019 Honda Accord | 🔍 Being inspected | No report yet — **start the full demo here** |
+| `dana@pitcrew.demo` | 2021 Toyota RAV4 | ✋ Needs a decision | Approve/decline each item, then pay with Stripe |
+| `tom@pitcrew.demo` | 2020 Subaru Outback | ✅ Ready for pickup | A finished, all-clear report |
+
+> 💡 Open the adviser and a customer in two browser profiles to watch state sync live
+> between them. Stripe is in test mode — pay with `4242 4242 4242 4242`, any future
+> expiry, any CVC.
 >
-> Reset the demo data anytime: [`/api/demo/reset`](https://pitcrew-okta.vercel.app/api/demo/reset)
+> Reset all demo data: [`/api/demo/reset`](https://pitcrew-okta.vercel.app/api/demo/reset)
+>
+> A fourth order (Priya's F-150) has **no** login on purpose — it's how you can verify a
+> signed-in customer never sees another customer's car.
 
 ---
 

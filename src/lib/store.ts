@@ -1,5 +1,13 @@
 import { Redis } from "@upstash/redis";
-import type { Finding, PartOffer, RepairOrder, Shop, User } from "./types";
+import type {
+  Finding,
+  OrderEvent,
+  PartOffer,
+  PaymentRecord,
+  RepairOrder,
+  Shop,
+  User,
+} from "./types";
 import { buildSeedOrders, SEED_SHOP, SEED_USERS, SEED_VERSION } from "./seed";
 
 // Shared demo store. On Vercel each function instance used to hold its own
@@ -132,6 +140,46 @@ export async function updateOrder(
   return order;
 }
 
+/**
+ * Append one history entry. Repeated identical decisions (a customer toggling
+ * approve → decline → approve) each get their own line — the record shows what
+ * happened, not a tidied version of it.
+ */
+export async function appendEvent(
+  orderId: string,
+  event: Omit<OrderEvent, "at"> & { at?: string },
+): Promise<RepairOrder | undefined> {
+  const state = await loadState();
+  const order = state.orders.find((o) => o.id === orderId);
+  if (!order) return undefined;
+  order.events = order.events ?? [];
+  order.events.push({ at: event.at ?? new Date().toISOString(), ...event });
+  order.updatedAt = new Date().toISOString();
+  await saveState(state);
+  return order;
+}
+
+export async function recordPayment(
+  orderId: string,
+  payment: PaymentRecord,
+): Promise<RepairOrder | undefined> {
+  const state = await loadState();
+  const order = state.orders.find((o) => o.id === orderId);
+  if (!order) return undefined;
+  if (order.payment) return order; // idempotent — confirm route can be refreshed
+  order.payment = payment;
+  order.events = order.events ?? [];
+  order.events.push({
+    at: payment.at,
+    actor: payment.processor === "Stripe" ? "Stripe" : "PitCrew (demo mode)",
+    label: "Payment received",
+    detail: `${(payment.amountCents / 100).toFixed(2)} USD · ref ${payment.reference}`,
+  });
+  order.updatedAt = new Date().toISOString();
+  await saveState(state);
+  return order;
+}
+
 export async function setItemApproval(
   orderId: string,
   itemId: string,
@@ -142,6 +190,15 @@ export async function setItemApproval(
   const finding = order?.report?.findings.find((f) => f.id === itemId);
   if (!order || !finding) return undefined;
   finding.approved = approved;
+  order.events = order.events ?? [];
+  if (approved !== null) {
+    order.events.push({
+      at: new Date().toISOString(),
+      actor: `${order.customerName}, customer`,
+      label: approved ? "Approved a repair" : "Declined a repair",
+      detail: `${finding.title} — ${(finding.priceCents / 100).toFixed(2)} USD`,
+    });
+  }
   order.updatedAt = new Date().toISOString();
   await saveState(state);
   return order;
@@ -157,8 +214,15 @@ export async function setFindingPart(
   const order = state.orders.find((o) => o.id === orderId);
   const finding = order?.report?.findings.find((f) => f.id === findingId);
   if (!order || !finding) return undefined;
+  order.events = order.events ?? [];
   if (part) {
     finding.selectedPart = part;
+    order.events.push({
+      at: new Date().toISOString(),
+      actor: "Service adviser",
+      label: "Part sourced",
+      detail: `${part.title} — ${part.vendor}, ${(part.priceCents / 100).toFixed(2)} USD`,
+    });
   } else {
     delete finding.selectedPart;
   }
