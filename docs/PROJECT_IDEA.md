@@ -35,7 +35,7 @@ The bay sits idle. Revenue slips. Trust erodes.
 
 | Role | Who | What they do in PitCrew |
 |---|---|---|
-| **Shop Advisor** (admin) | Independent repair shop owner / service advisor | Opens repair orders, dumps raw tech notes, hits "Generate Report", tracks approvals |
+| **Repair Advisor** (admin) | Independent repair shop owner / service advisor | Opens repair orders, dumps raw tech notes, hits "Generate Report", tracks approvals |
 | **Customer** (car owner) | Vehicle owner / family | Sees their vehicle, reads plain-English findings, approves line items, pays |
 
 Two clearly separate experiences, one codebase, one Auth0 tenant, role-based routing.
@@ -132,7 +132,7 @@ Both are visible on screen in the demo. Test mode, test cards.
 
 ## 7. Demo Flow (the 90-second script)
 
-1. **Shop Advisor** logs in via Auth0 → dashboard shows 4 repair orders, one flagged *Awaiting Inspection*
+1. **Repair Advisor** logs in via Auth0 → dashboard shows 4 repair orders, one flagged *Awaiting Inspection*
 2. Advisor opens the 2019 Honda Accord order, pastes the **real ugly technician note** from `image.png`
 3. Clicks **Generate PitCrew Report** → raw jargon becomes a structured, color-coded customer report *(the wow moment)*
 4. Advisor clicks **Send to Customer** → status moves to *Awaiting Approval*

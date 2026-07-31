@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   }
   if (resolveRole(session.user.email) !== "advisor") {
     return NextResponse.json(
-      { error: "Only shop advisors can manage the subscription" },
+      { error: "Only repair advisors can manage the subscription" },
       { status: 403 },
     );
   }

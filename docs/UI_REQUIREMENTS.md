@@ -121,13 +121,13 @@ works on a projector), content area on `--bg`.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│ 🔧 PitCrew   │ Precision Auto Care          [Shop Advisor]  Sarah M. ▾     │
+│ 🔧 PitCrew   │ Precision Auto Care          [Repair Advisor]  Sarah M. ▾     │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
 - Left: logo + wordmark → links to role home (`/shop` or `/garage`).
 - Center-left: current shop name (`Precision Auto Care`) — this makes tenancy visible.
-- Right: **role badge pill** (`Shop Advisor` / `Customer`) + user name + avatar dropdown
+- Right: **role badge pill** (`Repair Advisor` / `Customer`) + user name + avatar dropdown
   (Sign out only).
 - The role badge is not decoration — judges need to see which user they're looking at when
   we switch browsers. Make it legible from across a room: `13px`, high contrast, always visible.

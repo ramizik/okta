@@ -22,7 +22,7 @@ export function Logo({ tone = "light" }: { tone?: "light" | "dark" }) {
 }
 
 export function RoleBadge({ role }: { role: Role }) {
-  const label = role === "advisor" ? "Shop Advisor" : "Customer";
+  const label = role === "advisor" ? "Repair Advisor" : "Customer";
   return (
     <span className="rounded-full bg-primary px-3 py-1 text-[13px] font-semibold text-primary-foreground">
       {label}

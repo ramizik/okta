@@ -33,7 +33,7 @@ export function PricingPlans({
       return;
     }
     if (!isAdvisor) {
-      toast.error("Only shop advisors can manage the subscription");
+      toast.error("Only repair advisors can manage the subscription");
       return;
     }
 
