@@ -326,9 +326,12 @@ export function buildSeedOrders(): RepairOrder[] {
       id: "ro_002",
       shopId: SEED_SHOP.id,
       shopName: SEED_SHOP.name,
-      customerName: "Dana Ortiz",
-      customerEmail: "dana.ortiz@example.com",
-      customerPhone: "(209) 555-0177",
+      // Marcus's second car. Seeded at AWAITING_APPROVAL so the demo can show
+      // the approve-and-pay screen without first running the live generation —
+      // and so there's a fallback if the AI step is slow on stage.
+      customerName: "Marcus Chen",
+      customerEmail: "customer@pitcrew.demo",
+      customerPhone: "(209) 555-0142",
       vehicle: {
         id: "veh_rav4",
         year: 2021,
@@ -437,9 +440,11 @@ export function buildSeedOrders(): RepairOrder[] {
       id: "ro_004",
       shopId: SEED_SHOP.id,
       shopName: SEED_SHOP.name,
-      customerName: "Tom Whitfield",
-      customerEmail: "tom.whitfield@example.com",
-      customerPhone: "(209) 555-0128",
+      // Marcus's third car — the finished state, so the garage shows the full
+      // arc (being inspected / needs a decision / done) on one login.
+      customerName: "Marcus Chen",
+      customerEmail: "customer@pitcrew.demo",
+      customerPhone: "(209) 555-0142",
       vehicle: {
         id: "veh_outback",
         year: 2020,
