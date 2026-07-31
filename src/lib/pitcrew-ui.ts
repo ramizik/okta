@@ -374,6 +374,19 @@ export function orderTotalCents(order: RepairOrder): number {
   return (order.report?.findings ?? []).reduce((s, f) => s + f.priceCents, 0);
 }
 
+// What the shop has actually committed to spend on parts: every finding where
+// an advisor picked a sourced offer in the parts panel. Grows live in the demo.
+export function partsSpendCents(order: RepairOrder): number {
+  return (order.report?.findings ?? []).reduce(
+    (s, f) => s + (f.selectedPart?.priceCents ?? 0),
+    0,
+  );
+}
+
+export function partsSourcedCount(order: RepairOrder): number {
+  return (order.report?.findings ?? []).filter((f) => f.selectedPart).length;
+}
+
 export function isPaid(order: RepairOrder): boolean {
   return (
     order.status === "PAID" ||

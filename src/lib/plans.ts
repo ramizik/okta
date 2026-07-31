@@ -45,3 +45,55 @@ export const PLANS: Plan[] = [
 export function getPlan(id: string): Plan | undefined {
   return PLANS.find((p) => p.id === id);
 }
+
+// Repair orders a shop may process per month, by tier. `null` plan = Free —
+// the state every shop starts in, and the reason the dashboard shows a meter.
+export const FREE_ORDER_LIMIT = 5;
+
+const ORDER_LIMITS: Record<PlanId, number | null> = {
+  starter: 100,
+  pro: null, // unlimited
+};
+
+export interface PlanUsage {
+  planName: string;
+  used: number;
+  limit: number | null; // null = unlimited
+  remaining: number | null;
+  percent: number; // 0-100, 100 when unlimited
+  atLimit: boolean;
+  nearLimit: boolean; // >= 80% used — trigger the upgrade nudge
+  nextPlan: Plan | null;
+}
+
+export function planUsage(plan: PlanId | null, used: number): PlanUsage {
+  const limit = plan ? ORDER_LIMITS[plan] : FREE_ORDER_LIMIT;
+  const planName = plan ? (getPlan(plan)?.name ?? "Free") : "Free";
+  const nextPlan =
+    plan === "pro" ? null : plan === "starter" ? getPlan("pro")! : getPlan("starter")!;
+
+  if (limit === null) {
+    return {
+      planName,
+      used,
+      limit: null,
+      remaining: null,
+      percent: 100,
+      atLimit: false,
+      nearLimit: false,
+      nextPlan: null,
+    };
+  }
+
+  const percent = Math.min(100, Math.round((used / limit) * 100));
+  return {
+    planName,
+    used,
+    limit,
+    remaining: Math.max(0, limit - used),
+    percent,
+    atLimit: used >= limit,
+    nearLimit: percent >= 80,
+    nextPlan,
+  };
+}

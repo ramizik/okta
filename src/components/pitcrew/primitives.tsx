@@ -24,6 +24,40 @@ export function StatCard({
   );
 }
 
+export function Meter({
+  percent,
+  tone = "neutral",
+  className,
+}: {
+  percent: number;
+  tone?: "neutral" | "warn" | "over";
+  className?: string;
+}) {
+  const value = Math.max(0, Math.min(100, percent));
+  return (
+    <div
+      role="progressbar"
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      className={cn(
+        "h-2.5 w-full overflow-hidden rounded-full bg-secondary",
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "h-full rounded-full transition-[width] duration-500 ease-out",
+          tone === "over" && "bg-sev-red-fg",
+          tone === "warn" && "bg-sev-amber-fg",
+          tone === "neutral" && "bg-primary",
+        )}
+        style={{ width: `${value}%` }}
+      />
+    </div>
+  );
+}
+
 export function EmptyState({
   icon,
   title,

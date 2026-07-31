@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Check, ClipboardList, Clock, DollarSign, Timer } from "lucide-react";
-import { getPlan } from "@/lib/plans";
+import { ArrowRight, Check, Clock, DollarSign, Package } from "lucide-react";
+import { getPlan, planUsage, type PlanUsage } from "@/lib/plans";
 import { auth0 } from "@/lib/auth0";
 import { getSeedUser } from "@/lib/roles";
 import { approvedTotalCents, getOrders, getShop } from "@/lib/store";
 import { formatRelative, formatUsd } from "@/lib/format";
-import { isPaid, orderTotalCents, vehicleName } from "@/lib/pitcrew-ui";
+import {
+  isPaid,
+  orderTotalCents,
+  partsSourcedCount,
+  partsSpendCents,
+  vehicleName,
+} from "@/lib/pitcrew-ui";
 import { AppTopBar, RoleSwitchHint } from "@/components/pitcrew/app-shell";
-import { StatCard } from "@/components/pitcrew/primitives";
+import { Meter, StatCard } from "@/components/pitcrew/primitives";
 import { OrdersTable, type OrderRow } from "./orders-table";
 
 export const dynamic = "force-dynamic";
@@ -48,6 +54,9 @@ export default async function ShopDashboard({
   const revenueCents = orders
     .filter(isPaid)
     .reduce((sum, o) => sum + approvedTotalCents(o), 0);
+  const partsCents = orders.reduce((sum, o) => sum + partsSpendCents(o), 0);
+  const partsCount = orders.reduce((sum, o) => sum + partsSourcedCount(o), 0);
+  const usage = planUsage(shop.plan, orders.length);
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -99,11 +108,16 @@ export default async function ShopDashboard({
           </div>
         )}
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <StatCard
-            label="Orders today"
-            value={String(orders.length)}
-            icon={<ClipboardList className="h-4 w-4" />}
+            label="Spent on parts"
+            value={formatUsd(partsCents)}
+            hint={
+              partsCount
+                ? `${partsCount} part${partsCount === 1 ? "" : "s"} sourced across open orders`
+                : "Source parts from an order to start tracking"
+            }
+            icon={<Package className="h-4 w-4" />}
           />
           <StatCard
             label="Awaiting approval"
@@ -114,18 +128,75 @@ export default async function ShopDashboard({
           <StatCard
             label="Approved revenue"
             value={formatUsd(revenueCents)}
+            hint={
+              partsCents
+                ? `${formatUsd(revenueCents - partsCents)} after parts`
+                : undefined
+            }
             icon={<DollarSign className="h-4 w-4" />}
           />
-          <StatCard
-            label="Avg approval"
-            value="14 min"
-            hint="Down from 3.5 hours"
-            icon={<Timer className="h-4 w-4" />}
-          />
         </div>
+
+        <PlanUsagePanel usage={usage} />
 
         <OrdersTable rows={rows} />
       </main>
     </div>
+  );
+}
+
+// The monetization nudge: an advisor sees exactly how much of their plan the
+// month's repair orders have eaten, and what upgrading buys them.
+function PlanUsagePanel({ usage }: { usage: PlanUsage }) {
+  const unlimited = usage.limit === null;
+  const tone = usage.atLimit ? "over" : usage.nearLimit ? "warn" : "neutral";
+
+  return (
+    <section className="mt-4 rounded-xl border border-border bg-card p-5 shadow-card">
+      <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="label-caps">Plan usage</span>
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              {usage.planName}
+            </span>
+          </div>
+
+          <p className="tnum mt-2 text-lg font-semibold">
+            {unlimited ? (
+              <>
+                {usage.used} repair orders this month ·{" "}
+                <span className="text-muted-foreground">unlimited</span>
+              </>
+            ) : (
+              <>
+                {usage.used} of {usage.limit} repair orders used this month
+              </>
+            )}
+          </p>
+
+          <Meter percent={usage.percent} tone={tone} className="mt-3" />
+
+          <p className="mt-2 text-[13px] text-muted-foreground">
+            {unlimited
+              ? "Pro plan — no monthly cap on orders, reports or payments."
+              : usage.atLimit
+                ? `You've hit the ${usage.planName} cap. Upgrade to keep generating reports and taking payments.`
+                : `${usage.remaining} order${usage.remaining === 1 ? "" : "s"} left before you need to upgrade.`}
+          </p>
+        </div>
+
+        {usage.nextPlan && (
+          <Link
+            href="/pricing"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors duration-150 hover:bg-primary-hover"
+          >
+            Upgrade to {usage.nextPlan.name} · $
+            {usage.nextPlan.priceCents / 100}/mo
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        )}
+      </div>
+    </section>
   );
 }

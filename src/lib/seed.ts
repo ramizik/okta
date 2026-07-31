@@ -3,7 +3,9 @@ import type { PartOffer, Report, RepairOrder, Shop, User } from "./types";
 export const SEED_SHOP: Shop = {
   id: "shop_precision",
   name: "Precision Auto Care",
-  plan: "starter",
+  // The demo starts on Free with 4 of 5 orders used — the plan meter on /shop
+  // is already in the amber band, which is what motivates the Stripe upgrade.
+  plan: null,
   location: "Stockton,California,United States",
 };
 
@@ -418,6 +420,19 @@ export function buildSeedOrders(): RepairOrder[] {
             urgency: "Immediately — avoid driving until fixed.",
             priceCents: 68500,
             approved: true,
+            // Job is on the lift, so the advisor already sourced these parts —
+            // this is what feeds "Spent on parts" on the dashboard.
+            selectedPart: {
+              id: "seed_part_pump",
+              title: "Motorcraft Water Pump PW-544 — F-150 3.5L EcoBoost",
+              vendor: "NAPA Auto Parts",
+              priceCents: 18742,
+              delivery: "Pickup today",
+              thumbnail: "",
+              link: "https://www.napaonline.com/",
+              rating: 4.7,
+              inStock: true,
+            },
           },
           {
             id: "f_r3_belt",
@@ -430,6 +445,17 @@ export function buildSeedOrders(): RepairOrder[] {
             urgency: "Being done with the water pump.",
             priceCents: 9800,
             approved: true,
+            selectedPart: {
+              id: "seed_part_belt",
+              title: "Gates Serpentine Belt K060923 — Ford F-150",
+              vendor: "RockAuto",
+              priceCents: 2688,
+              delivery: "Free delivery",
+              thumbnail: "",
+              link: "https://www.rockauto.com/",
+              rating: 4.7,
+              inStock: true,
+            },
           },
         ],
       },
