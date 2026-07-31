@@ -15,31 +15,41 @@ actually understands — then lets them approve and pay for the work in a tap.
 
 ## 🔑 Test it yourself
 
-Four accounts, all with the password **`PitCrew-Demo-2026!`**
+**Four real Auth0 accounts.** Every one uses the same password:
 
-**🔧 The shop side**
+```
+PitCrew-Demo-2026!
+```
 
-| Email | Sees |
+### 🔧 Shop side
+
+| Email | What this account is for |
 |---|---|
-| `advisor@pitcrew.demo` | Every repair order in the shop, the AI report generator, and live parts sourcing |
+| **`advisor@pitcrew.demo`** | Sarah Martinez, service adviser. Sees *every* order in the shop, generates the AI reports, and sources parts. Parts sourcing and the shop's margin are adviser-only — customers never see either. |
 
-**🚗 The customer side** — each account is pre-seeded at a different repair stage, so you can
-jump straight to any screen without clicking through the whole flow:
+### 🚗 Customer side
 
-| Email | Car | Stage | What you'll see |
-|---|---|---|---|
-| `customer@pitcrew.demo` | 2019 Honda Accord | 🔍 Being inspected | No report yet — **start the full demo here** |
-| `dana@pitcrew.demo` | 2021 Toyota RAV4 | ✋ Needs a decision | Approve/decline each item, then pay with Stripe |
-| `tom@pitcrew.demo` | 2020 Subaru Outback | ✅ Ready for pickup | A finished, all-clear report |
+Three separate customers, each **pre-seeded at a different repair stage** — so you can open
+any screen in the workflow directly, instead of clicking through the whole flow to reach it.
 
-> 💡 Open the adviser and a customer in two browser profiles to watch state sync live
-> between them. Stripe is in test mode — pay with `4242 4242 4242 4242`, any future
-> expiry, any CVC.
+| Email | Customer | Car | Stage | What loads |
+|---|---|---|---|---|
+| **`customer@pitcrew.demo`** | Marcus Chen | 2019 Honda Accord | 🔍 Being inspected | No report yet. **Start the full demo here** — the adviser generates it live. |
+| **`dana@pitcrew.demo`** | Dana Ortiz | 2021 Toyota RAV4 | ✋ Needs a decision | A finished report waiting on approval. Approve/decline line items, then pay. |
+| **`tom@pitcrew.demo`** | Tom Whitfield | 2020 Subaru Outback | ✅ Ready for pickup | Completed job, all-clear report. |
+
+**A fourth customer has no login at all.** Priya Nair's Ford F-150 appears on the adviser's
+dashboard but belongs to no demo account — sign in as any customer and you'll find it
+unreachable. That's the multi-tenancy boundary, and you can check it yourself.
+
+> ⚡ **Fastest path to the money shot:** sign in as `dana@pitcrew.demo` and pay. Stripe is in
+> test mode — card `4242 4242 4242 4242`, any future expiry, any CVC.
 >
-> Reset all demo data: [`/api/demo/reset`](https://pitcrew-okta.vercel.app/api/demo/reset)
+> 👥 **See both sides at once:** open the adviser in one browser profile and a customer in
+> another. State is shared through Redis, so approving on one screen updates the other.
 >
-> A fourth order (Priya's F-150) has **no** login on purpose — it's how you can verify a
-> signed-in customer never sees another customer's car.
+> ♻️ **Reset everything:** [`/api/demo/reset`](https://pitcrew-okta.vercel.app/api/demo/reset)
+> restores all four accounts to their starting stages.
 
 ---
 
